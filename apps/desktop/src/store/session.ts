@@ -1741,7 +1741,7 @@ export const setCurrentReasoningEffort = (next: Updater<string>) => {
 
 /** The level the route actually sends for `$currentReasoningEffort`
  *  (`session.info.reasoning_effort_wire`): '' when unknown, equal when verbatim,
- *  weaker when the route clamps a Hermes-internal step such as `ultra`. Never
+ *  weaker when the route clamps a BLHermes-internal step such as `ultra`. Never
  *  persisted — it describes the live route, not a user preference. */
 export const $currentReasoningEffortWire = atom('')
 

@@ -9,23 +9,23 @@ export const enErrorLayers: Pick<ThreadCopy, 'errorLayerBodies' | 'errorLayers'>
     billing: 'Out of credits',
     disk: 'Disk full',
     endpoint: "Can't reach your model server",
-    gateway: 'Hermes hit a problem',
-    generic: "Hermes couldn't finish this reply",
+    gateway: 'BLHermes hit a problem',
+    generic: "BLHermes couldn't finish this reply",
     provider: 'The AI service returned an error',
-    runtime: 'Hermes hit a problem',
+    runtime: 'BLHermes hit a problem',
     streaming: 'The reply was cut off'
   },
   errorLayerBodies: {
     auth: 'The AI service rejected your sign-in. Check the credentials for this provider, then send your message again.',
     billing: 'Your account has no credits left for this provider. Top up or switch provider, then send again.',
-    disk: 'Your disk is full, so Hermes could not save this conversation. Free some space, then retry.',
-    endpoint: "Hermes can't reach your custom model server. Check that it is running, then send your message again.",
+    disk: 'Your disk is full, so BLHermes could not save this conversation. Free some space, then retry.',
+    endpoint: "BLHermes can't reach your custom model server. Check that it is running, then send your message again.",
     gateway:
-      'Hermes hit an internal problem starting this reply. Send your message again; if it keeps happening, send diagnostics.',
-    generic: 'Something went wrong while Hermes was replying. Retry, or copy the details if it keeps happening.',
+      'BLHermes hit an internal problem starting this reply. Send your message again; if it keeps happening, send diagnostics.',
+    generic: 'Something went wrong while BLHermes was replying. Retry, or copy the details if it keeps happening.',
     provider: 'The AI service could not complete this request. Retry in a moment or switch provider.',
     runtime:
-      'Hermes hit an internal problem starting this reply. Send your message again; if it keeps happening, send diagnostics.',
+      'BLHermes hit an internal problem starting this reply. Send your message again; if it keeps happening, send diagnostics.',
     streaming: 'The connection dropped before the reply finished. Retry to send it again.'
   }
 }

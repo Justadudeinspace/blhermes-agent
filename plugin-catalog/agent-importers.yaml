@@ -3,10 +3,10 @@ repo: https://github.com/NousResearch/hermes-official-plugins
 sha: 4187301277448603a1253017fc16ccf25e02c7f3
 subdir: agent-importers
 description: '`hermes import-agent`: import a Claude Code (~/.claude), Codex CLI (~/.codex) or Cursor
-  (~/.cursor) setup into Hermes in one command. Instructions, Cursor rules and memories become memory
+  (~/.cursor) setup into BLHermes in one command. Instructions, Cursor rules and memories become memory
   entries, Bash permission rules become command allow/deny lists, MCP servers land in config.yaml and
   skills are copied; always previews first, and `--sync` re-imports sources that changed. Formerly built
-  into Hermes core; profiles with a registered sync source are migrated automatically. Disclosure — no
+  into BLHermes core; profiles with a registered sync source are migrated automatically. Disclosure — no
   Python dependencies, no network calls and no model calls: it reads those agents'' local config trees
   (never their credential files; secret-looking MCP env vars and headers are stripped and listed) and
   writes only into the active profile (memories/MEMORY.md with a backup, config.yaml, skills/ and

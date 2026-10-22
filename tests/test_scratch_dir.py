@@ -20,7 +20,7 @@ from hermes_constants import apply_scratch_tmp_env, get_scratch_dir, prune_scrat
 
 
 def test_scratch_env_follows_home_and_respects_user_tmpdir(tmp_path):
-    """Unset temp vars → scratch of env HERMES_HOME; a Hermes-exported value re-derives for a routed
+    """Unset temp vars → scratch of env HERMES_HOME; a BLHermes-exported value re-derives for a routed
     home; a user/OS-set value (macOS ``/var/folders``, ``%TEMP%``) is never touched."""
     home_a, home_b = tmp_path / "a", tmp_path / "b"
     env = {"HERMES_HOME": str(home_a)}
@@ -585,10 +585,10 @@ def test_postremoval_unreadable_entry_is_not_counted_as_removed(tmp_path: Path) 
 @pytest.mark.platforms("posix")
 @pytest.mark.live_system_guard_bypass  # a red run must kill the orphan this test made (reparented to init)
 def test_prune_keeps_entry_a_registered_hermes_process_works_in_but_reaps_orphans(tmp_path, monkeypatch):
-    """#132401 live-worker guard: a background process Hermes itself started (tracked in the
+    """#132401 live-worker guard: a background process BLHermes itself started (tracked in the
     process registry's ``processes.json``) is never reaped, and the idle entry it works in is
     kept with an audit line. The orphaned grandchild of a registered shell that already exited
-    is no longer Hermes' — it is still reaped and its entry removed. Red on the cwd-only reap."""
+    is no longer BLHermes' — it is still reaped and its entry removed. Red on the cwd-only reap."""
     from tools.process_registry import ProcessRegistry
 
     monkeypatch.setenv("HERMES_HOME", str(tmp_path))
@@ -612,7 +612,7 @@ def test_prune_keeps_entry_a_registered_hermes_process_works_in_but_reaps_orphan
     try:
         assert prune_scratch_dir(scratch) == 1
         assert owned_dir.exists() and not orphan_dir.exists()
-        assert worker.process.poll() is None, "registered Hermes worker was reaped"
+        assert worker.process.poll() is None, "registered BLHermes worker was reaped"
         def _orphan_gone():
             try:
                 return psutil.Process(orphan).status() == psutil.STATUS_ZOMBIE
@@ -620,7 +620,7 @@ def test_prune_keeps_entry_a_registered_hermes_process_works_in_but_reaps_orphan
                 return True
         wait_until(_orphan_gone, timeout=10, what="orphan reaped")
         log = (tmp_path / "logs" / "scratch-prune.log").read_text(encoding="utf-8-sig")
-        assert f"kept {str(owned_dir)!r} — live Hermes process pid=" in log, log
+        assert f"kept {str(owned_dir)!r} — live BLHermes process pid=" in log, log
     finally:
         registry.kill_process(worker.id)
         with contextlib.suppress(psutil.Error):
@@ -629,7 +629,7 @@ def test_prune_keeps_entry_a_registered_hermes_process_works_in_but_reaps_orphan
 
 @pytest.mark.platforms("posix")
 def test_prune_keeps_entry_the_pruning_sessions_own_lineage_works_in(tmp_path, monkeypatch):
-    """#132401 review: a live session inside an idle entry that launches another Hermes
+    """#132401 review: a live session inside an idle entry that launches another BLHermes
     command is the pruner's ancestor — never signalled, and its entry must not be deleted
     from under it either."""
     scratch = get_scratch_dir(tmp_path, prune=False)

@@ -3,7 +3,7 @@ repo: https://github.com/Adolanium/hermes-tailscale
 sha: 778a49b0bc499e7c8457d1f83159d4054fcfdc8e
 version: "0.0.7"
 image: https://raw.githubusercontent.com/Adolanium/hermes-tailscale/778a49b0bc499e7c8457d1f83159d4054fcfdc8e/assets/catalog-banner.png
-description: Browse Tailscale devices and connect to remote Hermes instances in Hermes Desktop.
+description: Browse Tailscale devices and connect to remote BLHermes instances in BLHermes Desktop.
 maintainer: Adolanium
 tier: community
 category: desktop

@@ -308,7 +308,7 @@ def test_parked_status_still_reports_a_forced_gateway(homes, monkeypatch, capsys
 
 
 @pytest.mark.parametrize('verdict, healthy', [
-    (('incompatible', 'runtime_protocol'), False),  # an older Hermes's daemon left running
+    (('incompatible', 'runtime_protocol'), False),  # an older BLHermes's daemon left running
     (('ready', None), True),
 ])
 def test_status_flags_a_gateway_this_hermes_cannot_attach(homes, monkeypatch, capsys, verdict, healthy):

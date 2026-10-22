@@ -159,7 +159,7 @@ def test_restart_refuses_on_the_published_active_agents_of_an_older_gateway(monk
 
 def test_stop_all_leaves_another_homes_gateway_process_alone(monkeypatch, recorded, tmp_path):
     """``kill_gateway_processes(all_profiles=True)`` scans every gateway of this account; a scratch-home
-    ``stop --all`` must not SIGTERM a gateway running on another Hermes home."""
+    ``stop --all`` must not SIGTERM a gateway running on another BLHermes home."""
     from hermes_cli import dashboard_procs
     own, other = str(gw.get_hermes_home()), str(tmp_path / "account" / ".hermes")
     monkeypatch.setattr(gw, "find_gateway_pids", lambda *a, **k: [111, 222])

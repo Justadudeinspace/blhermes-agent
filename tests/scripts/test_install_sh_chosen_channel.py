@@ -1,7 +1,7 @@
 """An installer rerun keeps a checkout on the update channel it chose (#137714).
 
 Hermes-Setup reruns install.sh with its baked ``--branch main``. A checkout whose
-config.yaml record (written by Hermes itself) names ``stable`` must stay where
+config.yaml record (written by BLHermes itself) names ``stable`` must stay where
 ``hermes update`` put it; a ``main`` record still follows the branch.
 """
 from pathlib import Path

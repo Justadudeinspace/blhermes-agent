@@ -1,4 +1,4 @@
-"""Plugin-declared OAuth clients: Hermes signs in, stores and refreshes the grant; plugin code never holds a token.
+"""Plugin-declared OAuth clients: BLHermes signs in, stores and refreshes the grant; plugin code never holds a token.
 
 A real plugin directory under the test HERMES_HOME declares ``oauth:``. ``FakeIdP`` plays the authorization
 server (PKCE, rotating refresh tokens) and a loopback stub plays the API the bearer is meant for.
@@ -128,7 +128,7 @@ def idp(monkeypatch, tmp_path):
     server.opened = []
 
     def browser(url: str) -> bool:
-        # A real browser runs beside Hermes; the fake IdP 302s straight to the loopback callback.
+        # A real browser runs beside BLHermes; the fake IdP 302s straight to the loopback callback.
         server.opened.append(url)
         threading.Thread(target=lambda: urlopen(url, timeout=10, context=trust).close(), daemon=True).start()
         return True

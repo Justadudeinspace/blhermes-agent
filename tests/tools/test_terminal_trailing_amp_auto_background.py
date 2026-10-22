@@ -22,7 +22,7 @@ def _env_config(cwd):
 
 def test_trailing_amp_runs_as_tracked_background_through_the_same_guards(tmp_path, monkeypatch):
     """Real local backend + registry: one tracked session, the payload runs once, the approval
-    guard sees the command that actually runs, and the result says what Hermes did."""
+    guard sees the command that actually runs, and the result says what BLHermes did."""
     from tools.process_registry import process_registry
     from tools.terminal_tool import terminal_tool
 

@@ -169,7 +169,7 @@ export function exposePluginSDK() {
       useConfirmDelete,
     },
 
-    // Hermes API client
+    // BLHermes API client
     api,
     // Raw fetchJSON for plugin-specific JSON endpoints
     fetchJSON,

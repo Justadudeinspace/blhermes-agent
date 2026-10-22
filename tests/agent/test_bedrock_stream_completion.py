@@ -1,4 +1,4 @@
-"""Audit: actual boto3 HTTP/EventStream parsing before Hermes normalization."""
+"""Audit: actual boto3 HTTP/EventStream parsing before BLHermes normalization."""
 
 import json
 import struct

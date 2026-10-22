@@ -1,13 +1,13 @@
 ---
 sidebar_label: "Catalog submission"
 title: "Submitting to the Plugin Catalog"
-description: "The full admission guidelines for the Hermes plugin catalog: what to check before you submit, the rules every entry follows, and what reviewers look at"
+description: "The full admission guidelines for the BLHermes plugin catalog: what to check before you submit, the rules every entry follows, and what reviewers look at"
 ---
 
 # Submitting to the Plugin Catalog
 
 The [plugin catalog](../../user-guide/features/plugin-catalog.md) is a human-reviewed
-directory of Hermes plugins. Being listed is the trust signal: users install a
+directory of BLHermes plugins. Being listed is the trust signal: users install a
 catalog plugin by name, at the exact commit a maintainer read. This page holds
 the complete guidelines for getting a plugin in and keeping it there.
 
@@ -21,14 +21,14 @@ for word, and a test fails the build if the two drift apart.
 - **A public repository.** The `repo` URL is an `https://` URL anyone can clone
   (GitHub or GitLab).
 - **A loadable plugin at the commit you pin.** The tree has a `plugin.yaml`
-  manifest plus at least one entrypoint Hermes loads: `__init__.py` (Python),
+  manifest plus at least one entrypoint BLHermes loads: `__init__.py` (Python),
   `desktop/plugin.js` (Desktop), `plugin.json` (portable Agent Plugin) or
   `dashboard/manifest.json` (web dashboard). If the plugin lives in a monorepo,
   point `subdir` at its directory. The
   [plugin developer guide](./index.md) covers the layout.
-- **Public surfaces only.** Extend Hermes through hooks, middleware, the
+- **Public surfaces only.** Extend BLHermes through hooks, middleware, the
   `ctx.register_*` APIs, provider plugins and the
-  [Desktop plugin SDK](../desktop-plugin-sdk.md). Never patch Hermes
+  [Desktop plugin SDK](../desktop-plugin-sdk.md). Never patch BLHermes
   code or Desktop markup at runtime. If the hook you need is missing, see
   [Asking for a hook](#asking-for-a-hook).
 - **Validation passes locally.** Run the same check catalog CI runs, against a
@@ -40,7 +40,7 @@ for word, and a test fails the build if the two drift apart.
 
   It checks the manifest and `requires_hermes`, that the plugin loads, that the
   `capabilities` you declare match what it registers, `config_schema` and
-  `requires_env`, Python dependencies against Hermes's core constraints, the
+  `requires_env`, Python dependencies against BLHermes's core constraints, the
   install security scan, and the `desktop surface` and `no core override`
   rules. Fix every failure before opening the PR, and read the warnings, since
   a reviewer will.
@@ -53,7 +53,7 @@ for word, and a test fails the build if the two drift apart.
    [entry schema](https://github.com/NousResearch/hermes-agent/blob/main/plugin-catalog/README.md#entry-schema)
    and in [What's in an entry](../../user-guide/features/plugin-catalog.md#whats-in-an-entry).
    Pin `sha` to a full 40-character commit, and quote `version`.
-2. In the PR description, say what the plugin does, which Hermes surfaces it
+2. In the PR description, say what the plugin does, which BLHermes surfaces it
    uses, and everything rule 13 asks you to disclose. Add screenshots for
    anything with a UI.
 3. Wait for the catalog CI job to go green. It clones your repo at the pinned
@@ -88,7 +88,7 @@ the gallery. There is no separate listing to maintain.
 5. **Owner-or-major-contributor submissions, or a maintainer-curated sweep.**
    An entry may be submitted by the plugin repository's owner or a major
    contributor to it; drive-by submissions of third-party repos are declined.
-   Hermes maintainers may also add entries in batches from a reviewed sweep
+   BLHermes maintainers may also add entries in batches from a reviewed sweep
    of community plugins (every pin validated and scanned at the pinned
    commit, self-updater and credential-store checks run, English-first UI).
    Authors of swept-in entries keep control: a PR from the owner adjusting
@@ -118,7 +118,7 @@ the gallery. There is no separate listing to maintain.
    hide, click or rewrite core UI). `hermes plugins validate` refuses these at
    admission (`desktop surface` check); a plugin that needs a capability the
    SDK lacks asks for an SDK hook instead of patching around it.
-9. **No runtime overrides of Hermes core.** A listed plugin extends Hermes only
+9. **No runtime overrides of BLHermes core.** A listed plugin extends BLHermes only
    through public surfaces: hooks, middleware, provider profiles and the
    other `register_*` APIs, and Desktop SDK slots and routes. It must not
    replace, wrap or rebind core functions, methods, module attributes or
@@ -130,11 +130,11 @@ the gallery. There is no separate listing to maintain.
    undocumented core module, by file and line. If the hook you need does not
    exist, open an issue describing it: we would rather add the seam than list
    a patch.
-10. **Dependency security policy is the plugin's.** Hermes's 3-day
-   `exclude-newer` release-age check covers Hermes's own dependencies only, at
-   the time Hermes locks them; a plugin's `python_dependencies` /
+10. **Dependency security policy is the plugin's.** BLHermes's 3-day
+   `exclude-newer` release-age check covers BLHermes's own dependencies only, at
+   the time BLHermes locks them; a plugin's `python_dependencies` /
    `pyproject.toml` install under the plugin's policy (no age check), inside
-   Hermes's core constraints: Hermes's exact pins cannot move. Reviewers read the
+   BLHermes's core constraints: BLHermes's exact pins cannot move. Reviewers read the
    dependency list at the pinned SHA: bare floors (`>=X` with no upper bound)
    and floors on the newest release get a request for the oldest
    API-compatible floor plus an upper bound, and authors are strongly
@@ -142,26 +142,26 @@ the gallery. There is no separate listing to maintain.
    their CI) — see the developer guide's *Dependency security policy*. A
    recent floor alone is not grounds to hold an entry.
 
-11. **Credentials come through Hermes, never from files.** A plugin gets
-   secrets only through Hermes's routes. Its declared `requires_env` and
+11. **Credentials come through BLHermes, never from files.** A plugin gets
+   secrets only through BLHermes's routes. Its declared `requires_env` and
    `config_schema` secrets are read with `agent.secret_scope.get_secret(NAME)`,
    which honours the active profile (a bare `os.environ` read can pick up another
    profile's key under multiplexing). A subscription sign-in (Codex / ChatGPT
    today) is used only through `credentialed_provider_request` with
-   `requires_auth`, so Hermes attaches the token and the plugin never holds it. An
+   `requires_auth`, so BLHermes attaches the token and the plugin never holds it. An
    OAuth client for a third-party API (the user's own Google Cloud client, for
    example) is declared under `oauth:` in `plugin.yaml`, signed in with
-   `hermes auth add <plugin>:<id>` and used through the same helper; Hermes
+   `hermes auth add <plugin>:<id>` and used through the same helper; BLHermes
    stores and refreshes that token too. Its `authorize_url`, `token_url` and
-   `hosts` are `https` only, and its `hosts` belong to the API the scopes are for. A plugin never reads `.env` files, Hermes's `auth.json`, another tool's login (a
+   `hosts` are `https` only, and its `hosts` belong to the API the scopes are for. A plugin never reads `.env` files, BLHermes's `auth.json`, another tool's login (a
    vendor CLI's token file, a browser profile, a keychain) or any other
    credential store directly, and never refreshes, rotates or writes OAuth tokens
-   or presents itself as another vendor's client. If Hermes has no route for a
-   credential a plugin needs, ask for one in a Hermes issue or PR; the plugin
+   or presents itself as another vendor's client. If BLHermes has no route for a
+   credential a plugin needs, ask for one in a BLHermes issue or PR; the plugin
    does not work around it.
 12. **Approvals and unattended runs are respected.** A plugin never routes around
-   Hermes's approval system: no auto-approving, no disabling guards, and no
-   spawning Hermes or shell children that inherit YOLO or non-interactive mode
+   BLHermes's approval system: no auto-approving, no disabling guards, and no
+   spawning BLHermes or shell children that inherit YOLO or non-interactive mode
    to run commands nobody approved. Anything that waits for a person (a prompt,
    an OAuth browser flow) fails cleanly or times out under cron, the messaging
    gateway and other unattended runs instead of hanging the agent.
@@ -174,7 +174,7 @@ the gallery. There is no separate listing to maintain.
 14. **Compatibility metadata is truthful.** `requires_hermes` is a SemVer floor
    (`">=0.21.5"`), never a CalVer date, and never newer than the current release
    (the loader skips the plugin otherwise). `version` matches the pinned code,
-   and Python dependencies resolve under Hermes's core constraints
+   and Python dependencies resolve under BLHermes's core constraints
    (`hermes plugins validate --install-deps` is what CI runs).
 15. **No skins or forks of bundled plugins.** A change to a bundled plugin is a
    PR against `hermes-agent`, not a competing listing, and vendor-lookalike skins

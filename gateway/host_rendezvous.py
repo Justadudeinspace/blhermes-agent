@@ -21,7 +21,7 @@ A dead PID or a mismatched process incarnation is STALE and ignored — an attac
 never dial a recycled PID's port.
 
 **Relationship to ``spawn-ledger.json``** (``hermes_cli/process_identity.py``): the ledger stays
-the append-only machine roster of every long-lived Hermes process (Desktop's attach ladder reads
+the append-only machine roster of every long-lived BLHermes process (Desktop's attach ladder reads
 it) and is still written unchanged. It cannot be the host record: it has no lock, no
 single-writer semantics, no removal on exit, and no place to publish a protocol version or
 an authentication handle. The record here is authoritative for "who owns this host role"; the
@@ -102,7 +102,7 @@ class HostRecord:
     home: str = ""
     #: Stable process-start fingerprint. On Linux/WSL this is boot-relative /proc start ticks,
     #: so a wall-clock resync cannot make a live owner look like a recycled PID. Optional for
-    #: records written by older Hermes versions, which still fall back to create_time.
+    #: records written by older BLHermes versions, which still fall back to create_time.
     #: NOT unique across reboots — pair it with ``boot_epoch``.
     start_time: Optional[int] = None
     #: Instantiation epoch (boot id + PID 1 start). Distinguishes a pre-reboot owner from an

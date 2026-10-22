@@ -190,7 +190,7 @@ def test_user_agent_does_not_disturb_token_auth_preparation(tmp_path, monkeypatc
 
 
 # ---------------------------------------------------------------------------
-# Device flow: the token poll is sent by Hermes itself, so watch the socket
+# Device flow: the token poll is sent by BLHermes itself, so watch the socket
 # ---------------------------------------------------------------------------
 
 
@@ -282,6 +282,6 @@ def test_device_flow_token_poll_carries_a_user_agent_on_the_wire(
 
     assert [path for path, _ in seen] == ["/device", "/token", "/token"]
     agents = [headers.get("user-agent") for _, headers in seen]
-    assert all(agents), seen  # nothing leaves Hermes header-less
+    assert all(agents), seen  # nothing leaves BLHermes header-less
     polls = [headers.get("user-agent") for path, headers in seen if path == "/token"]
     assert polls == [DEFAULT_AUTH_REQUEST_USER_AGENT] * len(polls)

@@ -117,7 +117,7 @@ def _machine(tmp_path_factory, srv: FakeLLMServer, label: str) -> Machine:
     machine = new_machine(tmp_path_factory.mktemp(label), srv.base_url, label=label, system_git=True,
                           base_ref=PRE_RUNTIME_RELEASE)
     # A real profile's DACL (the user owns their home), and the origin + gitconfig the user can
-    # read: harness facts, so a standard-user verdict is about Hermes and nothing else.
+    # read: harness facts, so a standard-user verdict is about BLHermes and nothing else.
     grant_user_profile_acl(machine.profile)
     hand_to_user(machine.root)
     return machine

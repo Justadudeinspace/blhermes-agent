@@ -12,7 +12,7 @@ docs_url: https://github.com/itpartypattaya/hermes-plugin-holographic/blob/827c6
 known_issues:
 - "Word forms are matched by stems, not a dictionary: an irregular form can miss (ponies / pony). A synonym is found only if the fact's keywords name it, unless the optional online search by meaning is on; facts stored without keywords (older ones, auto_extract) need `enrich`."
 - "Arabic, Indic scripts, Indonesian, German, Turkish, Polish and Dutch are matched by scanning the facts' text: the first such search after start analyses every fact (about 1-1.5 s at 5,000 facts, 4-6 s at 20,000); stores without such facts never scan. The bundled dictionaries load on the first word of their language (Chinese about 0.2 s and 30 MB)."
-- "forget cleans the database file only: Hermes session history, `hermes backup` archives and copies other tools made are not rewritten (tools can read the `forgotten` table and clean their own copies by fact id)."
+- "forget cleans the database file only: BLHermes session history, `hermes backup` archives and copies other tools made are not rewritten (tools can read the `forgotten` table and clean their own copies by fact id)."
 capabilities:
   provides_tools: []
   provides_hooks: []

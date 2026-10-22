@@ -10,7 +10,7 @@ Every file here drives the REAL user entry points on a real Windows runner:
 
 Only external edges are replaced (tests/install/README.md, "The isolation trick"):
 
-* git: a bare clone of this checkout (``serve.git``) answers every canonical Hermes URL via
+* git: a bare clone of this checkout (``serve.git``) answers every canonical BLHermes URL via
   ``url.<file>.insteadOf`` in a machine-owned ``GIT_CONFIG_GLOBAL``. ``serve.git`` allows
   filtered fetches, so the installer's ``--filter=blob:none`` clone is a real partial clone,
   as it is against GitHub. Every ``git.exe`` directory is removed from PATH, so the
@@ -255,8 +255,8 @@ class Machine:
         blob = harness_git("-C", str(self.serve), "hash-object", "-w", "--no-filters", str(blob_src))
         index = self.root / "next.index"
         env = {"GIT_INDEX_FILE": str(index),
-               "GIT_AUTHOR_NAME": "Hermes E2E", "GIT_AUTHOR_EMAIL": "e2e@hermes.invalid",
-               "GIT_COMMITTER_NAME": "Hermes E2E", "GIT_COMMITTER_EMAIL": "e2e@hermes.invalid"}
+               "GIT_AUTHOR_NAME": "BLHermes E2E", "GIT_AUTHOR_EMAIL": "e2e@hermes.invalid",
+               "GIT_COMMITTER_NAME": "BLHermes E2E", "GIT_COMMITTER_EMAIL": "e2e@hermes.invalid"}
         harness_git("-C", str(self.serve), "read-tree", self.head, env=env)
         for path in (NEXT_MARKER, f"tests/e2e/{NEXT_MARKER}"):
             harness_git("-C", str(self.serve), "update-index", "--add", "--cacheinfo",
@@ -281,8 +281,8 @@ class Machine:
         blob = harness_git("-C", str(self.serve), "hash-object", "-w", "--no-filters", str(blob_src))
         index = self.root / f"{tag}.index"
         env = {"GIT_INDEX_FILE": str(index),
-               "GIT_AUTHOR_NAME": "Hermes E2E", "GIT_AUTHOR_EMAIL": "e2e@hermes.invalid",
-               "GIT_COMMITTER_NAME": "Hermes E2E", "GIT_COMMITTER_EMAIL": "e2e@hermes.invalid"}
+               "GIT_AUTHOR_NAME": "BLHermes E2E", "GIT_AUTHOR_EMAIL": "e2e@hermes.invalid",
+               "GIT_COMMITTER_NAME": "BLHermes E2E", "GIT_COMMITTER_EMAIL": "e2e@hermes.invalid"}
         harness_git("-C", str(self.serve), "read-tree", parent, env=env)
         harness_git("-C", str(self.serve), "update-index", "--add", "--cacheinfo",
                     f"100644,{blob},.hermes-e2e-{tag}", env=env)

@@ -2,7 +2,7 @@
 name: anatomy
 description: Explain an idea as an interactive isometric machine figure.
 version: 1.0.0
-author: Ryan (wheresryan22), ported to Hermes by Nous Research
+author: Ryan (wheresryan22), ported to BLHermes by Nous Research
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
@@ -19,9 +19,9 @@ This skill builds figures that work like a small instrument on a bench: a heavy 
 
 Output is a standalone HTML page (SVG plus optional WebGL layers), a lone `.svg`, or React/Next.js components. The kit uses only Node built-ins, so there is nothing to `npm install`.
 
-## Running it in Hermes
+## Running it in BLHermes
 
-**Skill directory.** Hermes expands `${HERMES_SKILL_DIR}` to this skill's installed directory. Shell variables don't carry over between terminal calls, so repeat the assignment in every call that uses it:
+**Skill directory.** BLHermes expands `${HERMES_SKILL_DIR}` to this skill's installed directory. Shell variables don't carry over between terminal calls, so repeat the assignment in every call that uses it:
 
 ```bash
 SKILL_DIR="${HERMES_SKILL_DIR}"
@@ -42,9 +42,9 @@ Start a new figure by copying the closest example into `$WORK/figures/<name>/` a
 
 **The examples ship as source only.** Upstream's built pages are 9 MB of generated HTML. Build an example (as above) to open or capture it, since it takes a few seconds.
 
-**Looking at your work.** The upstream workflow says "read every PNG". In Hermes that means `vision_analyze` on each capture, and the 4× close-ups use its `region` crop on a high-DPR capture or a `--zoom` capture. Ask specific questions ("does the pipe at the flange end on the flange face?"), not "does this look good".
+**Looking at your work.** The upstream workflow says "read every PNG". In BLHermes that means `vision_analyze` on each capture, and the 4× close-ups use its `region` crop on a high-DPR capture or a `--zoom` capture. Ask specific questions ("does the pipe at the flange end on the flange face?"), not "does this look good".
 
-**Browser.** The capture, drive, line-end and 3D checks start a headless Chrome over a loopback DevTools port. They use `CHROME_PATH` if set, then the Playwright headless shell that Hermes' browser tool installs (`chromium_headless_shell-*` in the Playwright cache), then a system Chrome or Chromium. Prefer the headless shell: it renders the WebGL layers through SwiftShader and makes no outbound connections. A full desktop Chrome opens background connections to Google services even with a throwaway profile, and it fails to start ("Socket path too long", then "Chrome did not start") when `TMPDIR` is a long path, as Hermes' per-profile scratch dir can be. If you must use one, set `TMPDIR` to a short directory for that command. Building a figure needs no browser at all.
+**Browser.** The capture, drive, line-end and 3D checks start a headless Chrome over a loopback DevTools port. They use `CHROME_PATH` if set, then the Playwright headless shell that BLHermes' browser tool installs (`chromium_headless_shell-*` in the Playwright cache), then a system Chrome or Chromium. Prefer the headless shell: it renders the WebGL layers through SwiftShader and makes no outbound connections. A full desktop Chrome opens background connections to Google services even with a throwaway profile, and it fails to start ("Socket path too long", then "Chrome did not start") when `TMPDIR` is a long path, as BLHermes' per-profile scratch dir can be. If you must use one, set `TMPDIR` to a short directory for that command. Building a figure needs no browser at all.
 
 **Long runs.** `node build.mjs --audit` takes about two minutes on a dense Hero, and a full 3D orbit audit takes 15 to 20 minutes for 30 parts. Run those with `terminal(background=true, notify=true)` and keep working on something else.
 
@@ -143,7 +143,7 @@ The kit is in `kit/`:
 
 Pick the path that fits the project:
 
-- **Standalone HTML, a static SVG, a blog post or any non-React site.** Write a Node build script like `examples/dial-indicator/build.mjs` in the workspace laid out under "Running it in Hermes". It imports `kit/iso-kit.mjs`, assembles strings with `solidSvg`, `lineSvg`, `dotsSvg`, `wireSvg` and `faceTextSvg`, wraps them with `figureSvg` and `plateHtml`, and writes the page with `pageHtml({ script: kitScript() + live })`, or `kitScript() + glScript() + live` when it has a shader. For a lone `.svg` file use `figureSvg({ standalone: "dark" | "light" })`, which embeds the styles.
+- **Standalone HTML, a static SVG, a blog post or any non-React site.** Write a Node build script like `examples/dial-indicator/build.mjs` in the workspace laid out under "Running it in BLHermes". It imports `kit/iso-kit.mjs`, assembles strings with `solidSvg`, `lineSvg`, `dotsSvg`, `wireSvg` and `faceTextSvg`, wraps them with `figureSvg` and `plateHtml`, and writes the page with `pageHtml({ script: kitScript() + live })`, or `kitScript() + glScript() + live` when it has a shader. For a lone `.svg` file use `figureSvg({ standalone: "dark" | "light" })`, which embeds the styles.
 - **React or Next.js.** Copy `kit/` into the project (for example `components/iso/`). Keep geometry in plain `.ts` modules, build the static art in a server component with the `draw.tsx` components, and pass it as element props to one `"use client"` live component that moves things. `references/react.md` explains the split and a trap with large pages.
 
 ## Craft rules (short form)

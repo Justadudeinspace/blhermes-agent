@@ -5,8 +5,8 @@ from hermes_cli.config import get_hermes_home
 
 
 def _incompatible_owner_verdict() -> str | None:
-    """``incompatible: <reason>`` when the gateway answering for this home is one this Hermes's clients
-    (TUI, Desktop, chat) refuse, e.g. an older Hermes's daemon left running across an upgrade."""
+    """``incompatible: <reason>`` when the gateway answering for this home is one this BLHermes's clients
+    (TUI, Desktop, chat) refuse, e.g. an older BLHermes's daemon left running across an upgrade."""
     from hermes_cli.gateway_runtime import discover_gateway_endpoint
     try:
         observed = discover_gateway_endpoint(get_hermes_home(), timeout=1.5)
@@ -18,14 +18,14 @@ def _incompatible_owner_verdict() -> str | None:
 
 
 def report_incompatible_owner(pids) -> bool:
-    """Print ✗ (with the fix) when the running gateway cannot serve this Hermes; True if printed.
+    """Print ✗ (with the fix) when the running gateway cannot serve this BLHermes; True if printed.
     ``pids`` names the scanned processes for the manual-run line; empty for a service-managed one."""
     stale = _incompatible_owner_verdict()
     if not stale:
         return False
     running = f"Gateway is running (PID: {', '.join(map(str, pids))})" if pids else "The running gateway"
-    print(f"✗ {running} but cannot serve this Hermes ({stale})")
-    print("  It was started by another Hermes version; TUI, Desktop and chat cannot attach to it.")
+    print(f"✗ {running} but cannot serve this BLHermes ({stale})")
+    print("  It was started by another BLHermes version; TUI, Desktop and chat cannot attach to it.")
     print("  Replace it with this version:")
     print("    hermes gateway restart")
     return True

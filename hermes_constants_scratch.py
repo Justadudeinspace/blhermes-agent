@@ -5,9 +5,9 @@ headless browsers whose cwd was inside the tree (they survived for days with a `
 cwd), and a repo whose linked worktree lived in the tree keeps a dangling registration until
 someone runs ``git worktree prune``. Both are reaped here, right before ``rmtree``.
 
-A process Hermes itself started is never an orphan, though: an idle entry a registered live
+A process BLHermes itself started is never an orphan, though: an idle entry a registered live
 process still works inside is kept, not reaped (#132401). Ownership comes from the two
-registries Hermes writes, not from a marker file a lane must remember to drop.
+registries BLHermes writes, not from a marker file a lane must remember to drop.
 """
 from __future__ import annotations
 
@@ -176,7 +176,7 @@ def _own_lineage() -> set[int]:
 
 
 def _registered_live_pids(home: Path) -> set[int]:
-    """Live pids Hermes registered for *home*: the machine spawn ledger (every long-lived entry
+    """Live pids BLHermes registered for *home*: the machine spawn ledger (every long-lived entry
     point and MCP helper, ``hermes_cli.process_identity``) and the background-process checkpoint
     (``tools.process_registry``, ``processes.json``). A recorded start time that no longer
     matches is a reused pid, not ownership."""
@@ -226,7 +226,7 @@ def _owned_by_hermes(proc, registered: set[int]) -> bool:
     import psutil
 
     try:
-        # pid 1 is excluded as an ancestor: a Hermes running as a container init adopts every orphan.
+        # pid 1 is excluded as an ancestor: a BLHermes running as a container init adopts every orphan.
         return proc.pid in registered or any(p.pid in registered and p.pid != 1 for p in proc.parents())
     except (psutil.Error, OSError):
         return False
@@ -240,7 +240,7 @@ def reap_processes_rooted_in(scratch_root: Path, doomed: list[Path], audit: logg
     editor, a log tail) is not ours to kill, but one *living* in a directory we are
     about to delete, or in one already gone, has nothing left to run for.
 
-    A process Hermes owns (:func:`_owned_by_hermes`) is never signalled; each doomed entry it
+    A process BLHermes owns (:func:`_owned_by_hermes`) is never signalled; each doomed entry it
     works inside is dropped from *doomed* in place and recorded as kept.
     """
     import psutil
@@ -251,7 +251,7 @@ def reap_processes_rooted_in(scratch_root: Path, doomed: list[Path], audit: logg
     uid = os.getuid() if hasattr(os, "getuid") else None
     victims: list[tuple[psutil.Process, str]] = []
     # The pruner's own lineage is never signalled, but its cwd still keeps an entry: a live
-    # session that launched this Hermes command may be working inside it.
+    # session that launched this BLHermes command may be working inside it.
     lineage: list[tuple[psutil.Process, str]] = []
     for proc in psutil.process_iter(["pid"]):
         try:
@@ -279,7 +279,7 @@ def reap_processes_rooted_in(scratch_root: Path, doomed: list[Path], audit: logg
                 name = proc.name()
             except (psutil.Error, OSError):
                 name = "?"
-            audit.info("scratch prune: kept %r — live Hermes process pid=%d (%r) works inside",
+            audit.info("scratch prune: kept %r — live BLHermes process pid=%d (%r) works inside",
                        os.fspath(entry), proc.pid, name)
     # Re-filter against the shrunk *doomed*: an orphan in a kept entry is spared with it (the
     # reap only exists to clear the way for rmtree); one whose cwd is already gone still goes.

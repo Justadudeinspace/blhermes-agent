@@ -1,4 +1,4 @@
-# Self-contained Hermes TUI, compiled by the same recipe as npm.
+# Self-contained BLHermes TUI, compiled by the same recipe as npm.
 { hermesNpmLib, ... }:
 hermesNpmLib.buildNpmPackage {
   dirs = [

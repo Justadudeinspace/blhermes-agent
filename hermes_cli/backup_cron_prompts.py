@@ -139,7 +139,7 @@ def restore_cron_prompt_fields_if_degraded(
     Args:
         snapshot_id: The pre-update quick-snapshot id (from
             :func:`create_quick_snapshot`).
-        hermes_home: Override for the Hermes home directory (tests/siblings).
+        hermes_home: Override for the BLHermes home directory (tests/siblings).
 
     Returns:
         ``None`` when no action was taken (the common, healthy path). On a

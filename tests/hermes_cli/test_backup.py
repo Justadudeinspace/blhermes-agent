@@ -461,7 +461,7 @@ class TestValidateBackupZip:
                 zf.writestr(name, "dummy")
 
     def test_state_db_passes(self, tmp_path):
-        """A zip containing state.db is accepted as a valid Hermes backup."""
+        """A zip containing state.db is accepted as a valid BLHermes backup."""
         from hermes_cli.backup import _validate_backup_zip
         zip_path = tmp_path / "backup.zip"
         self._make_zip(zip_path, ["state.db", "sessions/abc.json"])
@@ -729,7 +729,7 @@ class TestImport:
         assert cmd_import(args) is None
         out = capsys.readouterr().out
         assert "Preserved 1 runtime state file(s)" in out
-        assert "Done. Your Hermes configuration has been restored." in out
+        assert "Done. Your BLHermes configuration has been restored." in out
 
 
 
@@ -2057,7 +2057,7 @@ class TestPreMigrationBackup:
 
 
     def test_restorable_with_hermes_import(self, hermes_home, tmp_path):
-        """The zip produced by pre-migration backup must be a valid Hermes
+        """The zip produced by pre-migration backup must be a valid BLHermes
         backup — `hermes import` should accept it."""
         from hermes_cli.backup import create_pre_migration_backup, _validate_backup_zip
         out = create_pre_migration_backup(hermes_home=hermes_home)
@@ -2674,7 +2674,7 @@ class TestImportHonorsHermesHomeOverride:
 # ---------------------------------------------------------------------------
 
 def _write_session_db(path: Path, sessions: int, messages_per_session: int) -> None:
-    """Create a minimal Hermes-shaped session database at *path*."""
+    """Create a minimal BLHermes-shaped session database at *path*."""
     conn = sqlite3.connect(str(path))
     try:
         conn.execute(
@@ -2701,7 +2701,7 @@ def _write_session_db(path: Path, sessions: int, messages_per_session: int) -> N
 
 
 class TestImportLiveSessionDatabase:
-    """`hermes import` must not swap the inode of a database Hermes holds open.
+    """`hermes import` must not swap the inode of a database BLHermes holds open.
 
     Publishing state.db with a rename leaves any live gateway/dashboard/WebUI
     connection reading and writing the unlinked inode, so its sessions vanish

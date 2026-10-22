@@ -92,7 +92,7 @@ test('chunk splits into ~100-file batches with no leftovers', () => {
 test('customSign skips Store- submission packages (Partner Center signs)', async () => {
   const result = await customSign(
     { path: 'C:/out/Store-HermesBundled-0.28.0-win-x64.msix' },
-    { appInfo: { productFilename: 'Hermes' } },
+    { appInfo: { productFilename: 'BLHermes' } },
     { signMsix: async () => { throw new Error('must not be called') } }
   )
   assert.equal(result, true)

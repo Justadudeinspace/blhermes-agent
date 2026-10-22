@@ -1,4 +1,4 @@
-"""The autouse live-system guard: no real kills, Hermes-unit systemctl writes, gateway spawns or checkout writes.
+"""The autouse live-system guard: no real kills, BLHermes-unit systemctl writes, gateway spawns or checkout writes.
 
 Imported into ``tests/conftest.py`` so pytest registers the fixture there;
 ``pytest_plugins`` is not an option because ``tests/conftest.py`` is not the
@@ -30,7 +30,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 #    instead of silently murdering the real gateway.
 #  • ``subprocess.run`` / ``subprocess.Popen`` / ``call`` / ``check_call`` /
 #    ``check_output`` reject any ``systemctl ... <verb> <unit>`` invocation
-#    that would mutate ANY live Hermes unit — ``hermes-gateway[-<profile>]``,
+#    that would mutate ANY live BLHermes unit — ``hermes-gateway[-<profile>]``,
 #    ``hermes-dashboard[-<profile>]``, ``hermes-serve[-<profile>]`` and every
 #    other ``hermes``/``hermes-*`` unit. Read-only systemctl calls
 #    (``status``, ``show``, ``list-units``, ``is-active``) still pass through.
@@ -65,7 +65,7 @@ def _live_system_guard(request, monkeypatch):
       • os.system / os.popen
       • pty.spawn
       • asyncio.create_subprocess_exec / create_subprocess_shell
-    A mutating systemctl verb is refused against every Hermes unit
+    A mutating systemctl verb is refused against every BLHermes unit
     (``hermes``/``hermes-*``: gateway, dashboard, serve, any profile).
     Subprocess inspection looks at the WHOLE command string (not just
     tokens[0]), so ``bash -c "systemctl restart hermes-dashboard"``,
@@ -334,7 +334,7 @@ def _live_system_guard(request, monkeypatch):
             real_home = Path(pwd.getpwuid(_os.getuid()).pw_dir).resolve()
         except (ImportError, KeyError):
             real_home = Path.home().resolve()
-        # The child must not resolve the REAL Hermes root. Comparing HERMES_HOME against the whole
+        # The child must not resolve the REAL BLHermes root. Comparing HERMES_HOME against the whole
         # account home refused every Windows sandbox: %TEMP% lives under %USERPROFILE%.
         from hermes_state_guard import _real_platform_state_root
         real_root = _real_platform_state_root() or real_home / ".hermes"
@@ -357,7 +357,7 @@ def _live_system_guard(request, monkeypatch):
             raise RuntimeError(
                 f"tests/conftest.py live-system guard: blocked "
                 f"subprocess.{name}({cmd!r}) — would mutate a live "
-                "Hermes systemd unit (hermes-gateway*, hermes-dashboard*, "
+                "BLHermes systemd unit (hermes-gateway*, hermes-dashboard*, "
                 "hermes-serve*, ...). Mock "
                 "subprocess.run / _run_systemctl in the test, or "
                 "mark with @pytest.mark.live_system_guard_bypass."

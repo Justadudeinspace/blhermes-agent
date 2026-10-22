@@ -856,7 +856,7 @@ def _read_environment_block(address: int) -> dict[str, str]:
 
 
 def new_console_hermes_root() -> Path | None:
-    """The Hermes root that a newly opened console resolves, or None when Windows cannot say."""
+    """The BLHermes root that a newly opened console resolves, or None when Windows cannot say."""
     from hermes_constants import hermes_root_for_environment
 
     environ = _new_console_environment()
@@ -882,7 +882,7 @@ def owns_user_path(root: Path) -> bool:
 
     logging.getLogger(__name__).info(
         "User PATH left unchanged: new consoles use %s, not %s",
-        console_root or "an unknown Hermes home", root)
+        console_root or "an unknown BLHermes home", root)
     return False
 
 

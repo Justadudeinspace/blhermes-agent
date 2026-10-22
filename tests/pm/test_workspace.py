@@ -61,7 +61,7 @@ def test_missing_explicit_seed_cannot_silently_resolve_new_versions(layout):
 
 
 def test_plugin_workspace_trusts_core_lock_instead_of_rechecking_release_age(layout, locked_project):  # health: allow F811 -- pytest injects the imported locked_project fixture by parameter name
-    """Release age is checked when Hermes locks, never on the user's machine (#135589).
+    """Release age is checked when BLHermes locks, never on the user's machine (#135589).
 
     The generated root carries no ``exclude-newer`` (a mirror without upload times makes
     uv reject every file it cannot date) and adds no constraints of its own: core's ranges

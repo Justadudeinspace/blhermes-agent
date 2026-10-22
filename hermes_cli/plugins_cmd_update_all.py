@@ -17,7 +17,7 @@ from typing import Any
 
 # Only these classes have an update path `hermes plugins update <name>` can drive: a catalog install
 # re-pins to the reviewed sha, a tracked git install pulls. A pip row is a PyPI distribution that
-# Hermes never upgrades (#132494), so offering it would promise an update nothing applies.
+# BLHermes never upgrades (#132494), so offering it would promise an update nothing applies.
 _UPDATE_KIND = {"catalog": "catalog re-pin", "git": "git pull"}
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ def plan_update_all(results: list[Any]) -> UpdatePlan:
         elif row.update_available is True and row.klass in _UPDATE_KIND:
             plan.movable.append(row)
         elif row.update_available is True:
-            plan.skipped.append((row, f"{row.klass} distribution; Hermes does not upgrade it"))
+            plan.skipped.append((row, f"{row.klass} distribution; BLHermes does not upgrade it"))
         elif row.update_available is None:
             plan.skipped.append((row, row.reason or "update status unknown"))
         elif row.reason:  # up to date by construction but worth naming (pinned)

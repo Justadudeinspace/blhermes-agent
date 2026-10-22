@@ -1,4 +1,4 @@
-"""Shared ``OAuthClientProvider`` customizations for Hermes MCP OAuth.
+"""Shared ``OAuthClientProvider`` customizations for BLHermes MCP OAuth.
 
 Two code paths build an SDK provider — ``tools.mcp_oauth.build_oauth_auth`` (legacy public
 API) and ``tools.mcp_oauth_manager.MCPOAuthManager`` — and both need the same real-world
@@ -163,7 +163,7 @@ class HermesProviderMixin:
         installed on the context here and the SDK is handed an empty 204: ``handle_auth_metadata_response``
         reads that as "stop trying", leaving the installed document in place. ``auth_server_url`` is left
         untouched, so the SEP-2352 credential binding still uses the advertised identifier (stable across
-        runs), while the RFC 9207 ``iss`` check and Hermes' refresh-token binding use the document's issuer.
+        runs), while the RFC 9207 ``iss`` check and BLHermes' refresh-token binding use the document's issuer.
         Every other response goes back to the SDK unchanged, including its issuer check."""
         # This compatibility shim is only for authorization-server metadata
         # responses. Never consume arbitrary 200 responses here: MCP resource
@@ -450,7 +450,7 @@ class HermesProviderMixin:
         if not (200 <= response.status_code < 300):
             self._hermes_logger.warning("Token refresh failed: %s", response.status_code)
             # A writer outside the fence (interactive `hermes mcp login`, or a
-            # pre-fence Hermes sharing this HERMES_HOME) may have rotated the
+            # pre-fence BLHermes sharing this HERMES_HOME) may have rotated the
             # grant and persisted the replacement. Providers issuing single-use
             # refresh tokens reject our stale copy with a 400. Re-read disk
             # before destroying the session.
@@ -489,7 +489,7 @@ class HermesProviderMixin:
         Returns True only when disk holds a pair that is BOTH different from
         the one we just failed with AND still live. That is the signature of
         a writer outside the fence (an interactive ``hermes mcp login`` or a
-        pre-fence Hermes) having rotated the grant between our read and our
+        pre-fence BLHermes) having rotated the grant between our read and our
         POST -- a recoverable race, not a dead credential.
 
         Returns False for the genuinely-expired case (nobody wrote a newer
@@ -567,7 +567,7 @@ def google_offline_access_params(context: Any) -> dict[str, str]:
 
 def bind_issuer_from_context(context: Any) -> None:
     """Record the discovered issuer so the next ``storage.set_tokens`` (exchange or refresh) carries
-    it. No-op when metadata is not discovered yet or storage is not Hermes'."""
+    it. No-op when metadata is not discovered yet or storage is not BLHermes'."""
     from tools.mcp_oauth import HermesTokenStorage
     storage = getattr(context, "storage", None)
     issuer = _metadata_issuer(context)

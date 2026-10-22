@@ -5,7 +5,7 @@ request scoped to another served profile (its native grant, a ``?profile=`` sele
 profile's own plugins: discovered under its own home and the root, gated by its own ``plugins.enabled`` /
 ``plugins.disabled``, and run in its own plugin host (bound to its home and secret scope) whatever
 its ``plugins.isolation`` says, so another profile's plugin code never enters this process. Bundled
-plugins are Hermes code and stay in-process. The host protocol is request/response, so a secondary
+plugins are BLHermes code and stay in-process. The host protocol is request/response, so a secondary
 profile's plugin websockets are refused by name until it carries them.
 """
 

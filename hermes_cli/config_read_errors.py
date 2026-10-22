@@ -1,4 +1,4 @@
-"""What Hermes does when an existing ``config.yaml`` cannot be read or parsed.
+"""What BLHermes does when an existing ``config.yaml`` cannot be read or parsed.
 
 Readers fail open (``{}`` / defaults / last-known-good) so a broken file never takes the process
 down; this module makes that fallback loud (one warning per file signature, a ``corrupt`` backup),
@@ -28,11 +28,11 @@ _CONFIG_PARSE_WARNED: set = set()
 _CONFIG_PARSE_FAILURES: dict = {}
 
 _PARSE_FAILURE_FALLBACK_MSG = {
-    "last-known-good": "Hermes is running on the settings it loaded before the edit until it is fixed, so recent changes are not applied.",
-    "last-known-good-backup": "Hermes is running on your last good settings until it is fixed, so recent changes are not applied.",
+    "last-known-good": "BLHermes is running on the settings it loaded before the edit until it is fixed, so recent changes are not applied.",
+    "last-known-good-backup": "BLHermes is running on your last good settings until it is fixed, so recent changes are not applied.",
     "refuse-write": "Nothing was written, so the existing file is preserved."}
 _PARSE_FAILURE_DEFAULTS_MSG = (
-    "Hermes is running on default settings until it is fixed, so none of your saved settings are applied.")
+    "BLHermes is running on default settings until it is fixed, so none of your saved settings are applied.")
 _PARSE_FAILURE_REPAIR_MSG = "Open it with `hermes config edit`, fix {where}, then run `hermes config check`."
 _FIX_PERMS = "Fix the file permissions or move it aside first."
 _FIX_YAML = (
@@ -55,7 +55,7 @@ def _yaml_error_details(exc: Exception) -> str:
 
 
 def format_config_parse_failure(config_path: Path, exc: Exception, *, fallback: str = "defaults") -> str:
-    """User copy for an unparseable config.yaml: what happened, what Hermes is doing, how to fix.
+    """User copy for an unparseable config.yaml: what happened, what BLHermes is doing, how to fix.
     Only the problem line/column is printed; the raw PyYAML text goes to a ``Details:`` line."""
     where = _yaml_error_location(exc)
     at = f" at {where}" if where else ""

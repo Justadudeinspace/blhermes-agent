@@ -2,7 +2,7 @@ name: hermes-pantheon
 title: Pantheon
 repo: https://github.com/Adolanium/hermes-pantheon
 sha: c19043955225211d199921c21b4f8440ad0d6b98
-description: "Eighteen Hermes Desktop themes in dithered classical marble, one god each: all twelve Olympians plus Hades, Nyx, Helios, Selene and Medusa. Install once, then switch with /skin <name>. Disclosure — theme-only desktop plugin: it registers eighteen themes through the plugin SDK, and their stylesheets restyle parts of Desktop's own UI (sidebar art, tabs, composer, wordmark) only while a Pantheon theme is active. Fonts and art are bundled; no network requests, no agent tools or hooks."
+description: "Eighteen BLHermes Desktop themes in dithered classical marble, one god each: all twelve Olympians plus Hades, Nyx, Helios, Selene and Medusa. Install once, then switch with /skin <name>. Disclosure — theme-only desktop plugin: it registers eighteen themes through the plugin SDK, and their stylesheets restyle parts of Desktop's own UI (sidebar art, tabs, composer, wordmark) only while a Pantheon theme is active. Fonts and art are bundled; no network requests, no agent tools or hooks."
 maintainer: Adolanium
 tier: community
 category: desktop

@@ -1,6 +1,6 @@
 # Session Storage
 
-Hermes Agent uses a SQLite database (`~/.hermes/state.db`) to persist session
+BLHermes Agent uses a SQLite database (`~/.hermes/state.db`) to persist session
 metadata, full message history, and model configuration across CLI and gateway
 sessions. This replaces the earlier per-session JSONL file approach.
 
@@ -13,7 +13,7 @@ workers write through that owner (`RuntimeSessionStore` RPC), never by opening
 
 Source files: `hermes_state.py` (facade) plus the `hermes_state_*.py` siblings (schema, fts, search, compression, portability, gateway, ...)
 
-## Hermes home and profile isolation
+## BLHermes home and profile isolation
 
 `get_hermes_home()` is the authoritative filesystem resolver for state and
 configuration. It uses a context-local override first, then the `HERMES_HOME`
@@ -23,14 +23,14 @@ database is always `get_hermes_home() / "state.db"`, not a path that callers
 should hard-code as `~/.hermes/state.db`.
 
 Named profiles are isolated directories: a profile named `coder`, for example,
-uses `<default Hermes root>/profiles/coder/` and therefore has its own
+uses `<default BLHermes root>/profiles/coder/` and therefore has its own
 `state.db`, configuration, logs, and other profile-scoped state. A process that
 creates a database, reads configuration, or starts a child process for a
 profile must retain or pass that profile's `HERMES_HOME`; falling back to the
 default root mixes the wrong profile's state into the operation.
 
 The CLI bootstrap calls `_apply_profile_override()` before importing the rest
-of Hermes. An explicit `--profile`/`-p` resolves that profile and writes the
+of BLHermes. An explicit `--profile`/`-p` resolves that profile and writes the
 resolved directory to `HERMES_HOME`. Without an explicit selector, a
 profile-specific `HERMES_HOME` is preserved; otherwise the bootstrap can use
 the default root's active-profile selection. `HOME` only determines the
@@ -48,14 +48,14 @@ home relative to the user's home directory when possible (for example,
 
 Tests must use a temporary `HERMES_HOME` or an explicit temporary database
 path. The live-system guard raises before a test-context process opens a
-production `state.db` under the real default Hermes root or a real named
+production `state.db` under the real default BLHermes root or a real named
 profile, preventing fixture data or SQLite side effects from reaching a live
 installation.
 
 `HERMES_STATE_DB_GUARD_BYPASS=1` is a test-only escape hatch for a spawned
 child process that genuinely must access the live database. The equivalent
 in-process escape hatch is `@pytest.mark.live_system_guard_bypass`. Do not set
-either bypass in normal Hermes commands, development shells, or application
+either bypass in normal BLHermes commands, development shells, or application
 configuration: it disables the guard (a hard `RuntimeError`) that protects live
 session history, and a shell that exports it hands the bypass to every later
 pytest run.
@@ -89,7 +89,7 @@ history that appears to revert.
 
 The agent persists an accepted user input before starting its Codex turn. Codex
 then projects that input as a leading `userMessage` notification. At the runtime
-splice boundary, Hermes excludes only that leading item when it exactly matches
+splice boundary, BLHermes excludes only that leading item when it exactly matches
 the text serialized into `turn/start`, including rich-input coercion. Later or
 nonmatching user events remain intact, as do separately accepted identical turns.
 This also applies to synthetic/keyless input; it does not depend on a platform
@@ -260,7 +260,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id, id);
 Notes:
 - `tool_calls` is stored as a JSON string (serialized list of tool call objects)
 - `reasoning_details`, `codex_reasoning_items`, and `codex_message_items` are stored as JSON strings
-- `reasoning`, `reasoning_content` and `reasoning_details` are always kept in history. On the chat-completions wire every assistant turn replays its stored reasoning on the carriers the route reads (`agent/message_sanitization.py::route_reasoning_carriers`): `reasoning_content` everywhere by default; plus `reasoning` and `reasoning_details` on OpenRouter-format gateways (OpenRouter, Kilo, Vercel AI Gateway, Nous Portal); `reasoning_details` on Novita, MiniMax `/v1` and TokenHub; `reasoning` on local servers, Ollama and Upstage. Strict schemas (Mistral, Groq, Cerebras, SambaNova) get no reasoning key, and Fireworks gets `reasoning_content` only. Only DeepSeek, Kimi and MiMo pad a reasoning-less tool-call turn with `" "`. When a route rejects a field by name ("Extra inputs are not permitted, field: messages[N].reasoning_details"), Hermes records it for that provider/host/model, strips it and retries once. The record lasts for the session and never touches history.
+- `reasoning`, `reasoning_content` and `reasoning_details` are always kept in history. On the chat-completions wire every assistant turn replays its stored reasoning on the carriers the route reads (`agent/message_sanitization.py::route_reasoning_carriers`): `reasoning_content` everywhere by default; plus `reasoning` and `reasoning_details` on OpenRouter-format gateways (OpenRouter, Kilo, Vercel AI Gateway, Nous Portal); `reasoning_details` on Novita, MiniMax `/v1` and TokenHub; `reasoning` on local servers, Ollama and Upstage. Strict schemas (Mistral, Groq, Cerebras, SambaNova) get no reasoning key, and Fireworks gets `reasoning_content` only. Only DeepSeek, Kimi and MiMo pad a reasoning-less tool-call turn with `" "`. When a route rejects a field by name ("Extra inputs are not permitted, field: messages[N].reasoning_details"), BLHermes records it for that provider/host/model, strips it and retries once. The record lasts for the session and never touches history.
 - Desktop history hydration retains assistant sidecars in both REST and JSON-RPC (`session.resume`, `session.activate`, `session.history`) projections, including rows with reasoning and tool calls. REST may return the SQLite JSON string while RPC returns decoded items; Desktop accepts both. A final Responses reply may live only in `codex_message_items` while `content` is empty. Canonical content still takes precedence, and analysis/commentary items are not promoted to reply text.
 - `reasoning` stores the raw reasoning text for providers that expose it
 - A reasoning-only clean stop (empty `content`, `finish_reason=stop`, reasoning present) is answered with the reasoning text, but the assistant row is never written with that text as `content`: `content` stays empty, the text lives in `reasoning`/`reasoning_content`, and `api_content` carries it so the next request replays the answer byte-identically. History surfaces therefore show it as reasoning, not as a reply.
@@ -372,7 +372,7 @@ read from `/proc/locks` — SQLite's byte-range `fcntl` locks encode the lock ki
 in their offset (`state.db-shm` byte 120 = WAL write, 121 = checkpoint,
 123-127 = read slots; the 1 GiB pending-byte page on `state.db` = rollback-journal
 PENDING/RESERVED/SHARED). The open-descriptor scan cannot make this distinction
-because every Hermes process has the DB open. Look for that line in
+because every BLHermes process has the DB open. Look for that line in
 `~/.hermes/logs/errors.log` next to the `database is locked` failure.
 
 Lock contention is recognised by SQLite result code (`SQLITE_BUSY` /
@@ -598,7 +598,7 @@ db.delete_session("sess_abc123")
 
 Default path: `get_hermes_home() / "state.db"` — `~/.hermes/state.db` for the
 default profile, `~/.hermes/profiles/<name>/state.db` for a named profile, or
-wherever `HERMES_HOME` points (see [Hermes home and profile isolation](#hermes-home-and-profile-isolation)).
+wherever `HERMES_HOME` points (see [BLHermes home and profile isolation](#hermes-home-and-profile-isolation)).
 
 The database file, WAL file (`state.db-wal`), and shared-memory file
 (`state.db-shm`) are all created in the same directory.

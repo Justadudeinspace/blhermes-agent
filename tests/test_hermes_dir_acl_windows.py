@@ -285,12 +285,12 @@ def _w2(lock_dir):
     assert len(result["warnings"]) == 1, result
 
 
-# ── P2-5: an elevated grant never follows a junction out of the Hermes home ──────────────────────
+# ── P2-5: an elevated grant never follows a junction out of the BLHermes home ──────────────────────
 
 
 @pytest.fixture()
 def home_with_junction_out(tmp_path, monkeypatch):
-    """A Hermes home holding a directory junction (what same-user medium-integrity code can plant)
+    """A BLHermes home holding a directory junction (what same-user medium-integrity code can plant)
     to a directory outside it, standing in for ``C:\\Program Files\\<app>``."""
     if not _elevated():
         pytest.skip("needs an elevated token: only an elevated run grants")

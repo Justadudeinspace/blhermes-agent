@@ -228,7 +228,7 @@ export function createCheckoutStrategy(deps: CheckoutStrategyDeps): CheckoutStra
     }
 
     return refuse(
-      'The updater could not take the update lock, so nothing was changed. Hermes keeps running on the previous version — try the update again.',
+      'The updater could not take the update lock, so nothing was changed. BLHermes keeps running on the previous version — try the update again.',
       'updater-spawn-failed'
     )
   }
@@ -256,7 +256,7 @@ export function createCheckoutStrategy(deps: CheckoutStrategyDeps): CheckoutStra
       }
 
       failure =
-        'The updater did not start, so nothing was changed. Hermes keeps running on the previous version — try the update again.\n\n' +
+        'The updater did not start, so nothing was changed. BLHermes keeps running on the previous version — try the update again.\n\n' +
         `Details: the hand-off script never took the update lock within ${Math.round((deps.handoffClaimTimeoutMs ?? HANDOFF_CLAIM_TIMEOUT_MS) / 1000)} s.`
     }
 
@@ -357,7 +357,7 @@ export function createCheckoutStrategy(deps: CheckoutStrategyDeps): CheckoutStra
     //
     // SKIPPED for pre-#74782 staged updaters: those have no self-PID
     // exclusion, so they read this very marker as a foreign live owner and
-    // abort with "Another Hermes update is already running (PID <itself>)" —
+    // abort with "Another BLHermes update is already running (PID <itself>)" —
     // an unbreakable loop, because the update that would replace the stale
     // binary is the one being refused. Losing the anti-respawn hardening is
     // strictly better than never updating again, and the updater still writes
@@ -496,7 +496,7 @@ export function createCheckoutStrategy(deps: CheckoutStrategyDeps): CheckoutStra
     deps.emitUpdateProgress({
       stage: 'restart',
       message:
-        'Updating Hermes — this window will close and the updater will open. Don’t reopen Hermes yourself; it restarts automatically when the update finishes.',
+        'Updating BLHermes — this window will close and the updater will open. Don’t reopen BLHermes yourself; it restarts automatically when the update finishes.',
       percent: 100
     })
     deps.repairMacUpdaterHelper(updater)
@@ -738,7 +738,7 @@ export function createCheckoutStrategy(deps: CheckoutStrategyDeps): CheckoutStra
     deps.emitUpdateProgress({
       stage: 'restart',
       message:
-        'Updating Hermes — this window will close. Don’t reopen Hermes yourself; it restarts automatically when the update finishes.',
+        'Updating BLHermes — this window will close. Don’t reopen BLHermes yourself; it restarts automatically when the update finishes.',
       percent: 100
     })
 

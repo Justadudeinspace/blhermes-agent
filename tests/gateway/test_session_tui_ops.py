@@ -109,7 +109,7 @@ def test_delegation_pause_toggles_the_spawn_gate_and_status_reports_it(tmp_path)
 
 
 async def _git_rpc(ws, method, **params):
-    """``rpc`` with room for checkpoint git calls: each one resolves Hermes' managed git first, which
+    """``rpc`` with room for checkpoint git calls: each one resolves BLHermes' managed git first, which
     can take a second per call on a cold test home (the shared helper waits 20 s)."""
     await ws.send(json.dumps({'jsonrpc': '2.0', 'id': method, 'method': method, 'params': params}))
     async with asyncio.timeout(120):
@@ -236,7 +236,7 @@ def test_rollback_lists_diffs_and_restores_the_session_cwd_and_rewinds_the_last_
 
 
 def _agent_write(home, path, text):
-    """A file write Hermes made (and recorded in the agent-write ledger that safe restore reads)."""
+    """A file write BLHermes made (and recorded in the agent-write ledger that safe restore reads)."""
     from hermes_constants import reset_hermes_home_override, set_hermes_home_override
     from tools.checkpoint_manager import CheckpointManager
     path.write_text(text)

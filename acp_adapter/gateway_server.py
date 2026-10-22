@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 def _slash_command(text):
-    """Canonical Hermes command name ``text`` invokes, or None for ordinary text.
+    """Canonical BLHermes command name ``text`` invokes, or None for ordinary text.
 
     Only a registered command (or alias) is a command: ``/etc/hosts is wrong`` or ``/tmp/x``
     (a path, the same rule ``MessageEvent.get_command`` applies) and unknown ``/words`` are

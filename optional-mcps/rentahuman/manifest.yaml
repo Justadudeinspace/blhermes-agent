@@ -31,7 +31,7 @@ suggest:
     - rentahuman.ai
 
 post_install: |
-  On first connection, Hermes opens a browser to sign in to RentAHuman and
+  On first connection, BLHermes opens a browser to sign in to RentAHuman and
   approve access to your account. By default, this catalog entry enables only
   public, read-only discovery tools. Account data and tools that post or fund
   bounties, message people, accept applicants, book services, or manage payments

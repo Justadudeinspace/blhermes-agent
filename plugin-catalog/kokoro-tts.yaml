@@ -13,7 +13,7 @@ readme: true
 platforms: [macos]
 known_issues:
   - "macOS on Apple Silicon only (MLX)."
-  - "Under plugins.isolation: host the hermes kokoro terminal command is not available (Hermes skips plugin CLI commands in the host); the speech provider still registers."
+  - "Under plugins.isolation: host the hermes kokoro terminal command is not available (BLHermes skips plugin CLI commands in the host); the speech provider still registers."
   - "Only Brazilian Portuguese and English are tested; Japanese and Mandarin may need extra G2P packages this release does not install. Per-sentence language detection covers Portuguese and English."
 capabilities:
   provides_tools: []

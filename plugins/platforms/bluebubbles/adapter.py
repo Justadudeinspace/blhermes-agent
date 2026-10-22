@@ -51,7 +51,7 @@ DEFAULT_WEBHOOK_PATH = "/bluebubbles-webhook"
 MAX_TEXT_LENGTH = 4000
 
 # iMessage has no stable bot mention identity (unlike <@U...>/@botname/MXID), so
-# `require_mention: true` without custom aliases uses Hermes wake words.
+# `require_mention: true` without custom aliases uses BLHermes wake words.
 DEFAULT_MENTION_PATTERNS = [r"(?<![\w@])@?hermes\s+agent\b[,:\-]?", r"(?<![\w@])@?hermes\b[,:\-]?"]
 
 # Tapback associatedMessageType codes: 2000-2005 added, 3000-3005 removed (love, like, dislike, ...).
@@ -141,7 +141,7 @@ class BlueBubblesAdapter(BasePlatformAdapter):
     @staticmethod
     def _compile_mention_patterns(raw: Any) -> list[re.Pattern]:
         """Compile group-mention wake words; ``raw`` is a list, a raw env string (JSON list or
-        comma/newline-separated), or None (Hermes defaults)."""
+        comma/newline-separated), or None (BLHermes defaults)."""
         return compile_mention_patterns(raw, log_prefix="bluebubbles", defaults=DEFAULT_MENTION_PATTERNS,
                                         logger_=logger)
 
@@ -656,7 +656,7 @@ def interactive_setup() -> None:
     print_header("BlueBubbles (iMessage)")
     if declines_reconfigure("BlueBubbles", "Reconfigure BlueBubbles?", "BLUEBUBBLES_SERVER_URL"):
         return
-    _info("Connects Hermes to iMessage via BlueBubbles — a free, open-source",
+    _info("Connects BLHermes to iMessage via BlueBubbles — a free, open-source",
           "macOS server that bridges iMessage to any device.",
           "   Requires a Mac running BlueBubbles Server v1.0.0+",
           "   Download: https://bluebubbles.app/", None,
@@ -699,11 +699,11 @@ _PLATFORM_HINT = (
 
 
 def register(ctx) -> None:
-    """Plugin entry point — called by the Hermes plugin system."""
+    """Plugin entry point — called by the BLHermes plugin system."""
     from . import gateway_env  # env -> GatewayConfig bridge (gateway.config_env)
     ctx.register_platform(
         name="bluebubbles", label="BlueBubbles (iMessage)", adapter_factory=BlueBubblesAdapter,
-        dashboard_description="Use Hermes through iMessage via a BlueBubbles server.",
+        dashboard_description="Use BLHermes through iMessage via a BlueBubbles server.",
         docs_url="https://bluebubbles.app/",
         dashboard_env_vars=("BLUEBUBBLES_SERVER_URL", "BLUEBUBBLES_PASSWORD", "BLUEBUBBLES_ALLOWED_USERS"),
         check_fn=check_bluebubbles_requirements, is_connected=_is_connected,

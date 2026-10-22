@@ -1,6 +1,6 @@
 # Terminal Environment Provider Plugins
 
-Hermes runs shell commands through a pluggable set of **terminal backends**.
+BLHermes runs shell commands through a pluggable set of **terminal backends**.
 The built-in backends (local, Docker, Singularity, Modal, Daytona, Vercel
 Sandbox, SSH) live in the core repo under `tools/environments/`. Third-party
 sandbox vendors integrate as **plugins** instead — a standalone plugin repo
@@ -145,7 +145,7 @@ absolute in-sandbox path to start somewhere else:
 ```
 
 When the home directory is only known once the sandbox is up, return `"~"`
-instead. Hermes then passes `cwd="~"` to `create_environment()` (it never
+instead. BLHermes then passes `cwd="~"` to `create_environment()` (it never
 expands it on the host), and your environment sets `self.cwd` to the absolute
 home it resolved:
 
@@ -157,7 +157,7 @@ class AcmeBoxEnvironment(BaseEnvironment):
         super().__init__(cwd=cwd, timeout=timeout)
 ```
 
-Hermes keeps `~` as the backend default, so every new sandbox resolves its
+BLHermes keeps `~` as the backend default, so every new sandbox resolves its
 own home, and records the path each environment resolved on that environment.
 Commands can also arrive with `cwd="~"`; `BaseEnvironment` already `cd`s
 there correctly. A `cd` anywhere under that home is kept for later commands
@@ -166,7 +166,7 @@ sandbox path like `/home/acme/project` would be discarded as if it were a
 host path.
 
 `default_cwd` is read on every command, so keep it cheap (no network calls).
-Relative paths are ignored, because Hermes would anchor them on the host.
+Relative paths are ignored, because BLHermes would anchor them on the host.
 
 ## Bot Desktop and `computer_use`
 
@@ -179,7 +179,7 @@ stdout left open. A plugin backend can opt in the same way:
 2. Give the environment an `exec_prefix(*, user=None, interactive=True)` method.
    It returns a local argv that runs whatever follows it inside the sandbox,
    with stdin and stdout open (the shape of `docker exec -i <container>`), or
-   `None` when it can't right now. Hermes appends `bash -c <script>` as
+   `None` when it can't right now. BLHermes appends `bash -c <script>` as
    separate words, so the client must pass them through unchanged and the
    sandbox needs `bash`. `user` names the account to run as; ignore it if your
    backend can't switch users. Return a list, not a single command string.
@@ -198,7 +198,7 @@ has no such method gets the same default `BaseEnvironment` uses.
 
 Both `exec_prefix()` and the `~` home resolution read the environment object
 itself, so they work only for plugins loaded in-process. Under
-`plugins.isolation: host` the environment reaches Hermes as an opaque
+`plugins.isolation: host` the environment reaches BLHermes as an opaque
 placeholder: Bot Desktop refuses a `supports_streams` backend with a message
 naming the setting, and `default_cwd = "~"` stays a literal `~`.
 

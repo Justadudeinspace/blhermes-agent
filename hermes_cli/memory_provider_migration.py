@@ -48,7 +48,7 @@ def _failure_stamp(home: Path, plugin: str) -> Path:
 
 
 def _failure_count(stamp: Path) -> int:
-    """Consecutive failures recorded in *stamp*; the empty stamp an older Hermes touched counts once."""
+    """Consecutive failures recorded in *stamp*; the empty stamp an older BLHermes touched counts once."""
     try:
         text = stamp.read_text(encoding="utf-8-sig").strip()
     except OSError:
@@ -88,7 +88,7 @@ def configured_provider(home: Path) -> str:
 
 
 def provider_present(name: str, home: Path) -> bool:
-    """True when the provider resolves anywhere Hermes looks for *home* (bundled, that home's user
+    """True when the provider resolves anywhere BLHermes looks for *home* (bundled, that home's user
     plugins, entry point). The lookup reads the active home, so it is bound explicitly: the update
     hook walks several profile homes from one process."""
     from plugins.memory import find_provider_dir
@@ -300,7 +300,7 @@ def recover_at_startup(name: str, *, say: Optional[Callable[[str], None]] = None
     from pm.install import lazy_installs_allowed
     if not lazy_installs_allowed():
         report(f"⚠ Memory provider '{name}' is not installed, so external memory is off for this session. "
-               f"security.allow_lazy_installs is off, so Hermes did not fetch it: "
+               f"security.allow_lazy_installs is off, so BLHermes did not fetch it: "
                f"run `{_install_command(name, home)}`.")
         return False
     # Agent init cannot answer a dependency prompt: under the CLI the prompt_toolkit input owns the
@@ -310,7 +310,7 @@ def recover_at_startup(name: str, *, say: Optional[Callable[[str], None]] = None
     if name not in _LEFT_CORE:
         if _pending_provider(home, say=report) == name:
             report(f"⚠ Memory provider '{name}' is not installed, so external memory is off for this session. "
-                   f"It never shipped with Hermes, so Hermes installs it only when you ask: "
+                   f"It never shipped with BLHermes, so BLHermes installs it only when you ask: "
                    f"run `{_install_command(name, home)}`.")
         return False
     if _failed_recently(home, name):

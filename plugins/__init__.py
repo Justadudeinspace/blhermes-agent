@@ -1,1 +1,1 @@
-# Hermes plugins package
+# BLHermes plugins package

@@ -74,7 +74,7 @@ def _recorded_tree_for(cwd: str) -> Optional[dict]:
         repo = Path(str(entry.get("repo_root") or ""))
         tree = Path(str(entry.get("path") or ""))
         branch = str(entry.get("branch") or "")
-        # Only a direct child of the repo's Hermes worktree dir, as _setup_worktree makes them.
+        # Only a direct child of the repo's BLHermes worktree dir, as _setup_worktree makes them.
         if (branch and (repo / ".git").exists()
                 and _key(tree.parent) == _key(repo / ".worktrees") and _key(tree) == _key(candidate)):
             return {"path": str(tree), "branch": branch, "repo_root": str(repo)}

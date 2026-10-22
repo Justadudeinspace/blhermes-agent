@@ -62,7 +62,7 @@ KREA_MODEL_IDS = frozenset(_MODELS)
 
 DEFAULT_MODEL = "krea-2-medium"
 
-# Hermes' 3 abstract ratios → Krea's enum (1:1, 4:3, 3:2, 16:9, 2.35:1, 4:5, 2:3, 9:16).
+# BLHermes' 3 abstract ratios → Krea's enum (1:1, 4:3, 3:2, 16:9, 2.35:1, 4:5, 2:3, 9:16).
 _ASPECT_MAP = {"landscape": "16:9", "square": "1:1", "portrait": "9:16"}
 DEFAULT_RESOLUTION = "1K"  # Krea 2 is priced at 1K only; Krea 3 also takes 2K
 # Style refs are objects ({"url", "strength"}); bare URLs get Krea's recommended start (range -2..2).

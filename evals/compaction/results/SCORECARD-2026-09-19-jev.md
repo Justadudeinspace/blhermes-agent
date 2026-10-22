@@ -1,4 +1,4 @@
-# fast-jev-compaction vs Hermes compaction — 3-transcript scorecard (2026-09-19)
+# fast-jev-compaction vs BLHermes compaction — 3-transcript scorecard (2026-09-19)
 
 ## Verdict
 
@@ -86,10 +86,10 @@ Per-question paired comparison, jev vs current across 45 questions: 17 wins, 1 l
    noise floor. Lowering the threshold to 0.15 (jev_t15) reaches 90% but retains 396K of
    500K — that is not compaction.
 
-4. **The state ceiling does not fit Hermes scale.** Jev's 32K window forces the whole
+4. **The state ceiling does not fit BLHermes scale.** Jev's 32K window forces the whole
    history into 25K tokens; at 500K every transcript needed the harshest fitting stages
    ("old calls compacted/merged", "old messages collapsed") and one of four could not fit at
-   all. The plugin is designed for Claude Code's ~200K compaction point; a 1M-window Hermes
+   all. The plugin is designed for Claude Code's ~200K compaction point; a 1M-window BLHermes
    session compacting at 500K+ will fall back to the summary regularly, and once the tool
    results are gone a second compaction has nothing left to remove.
 
@@ -152,7 +152,7 @@ every ~40K tokens of new work with every turn billed at ~460K input.
   not committed. Question banks generated from the region current compaction summarises
   (the most conservative boundary) and cached per transcript+cap so every arm answers the
   identical exam.
-- The `jev` arm counts rows (Hermes has one `role: tool` row per result), so
+- The `jev` arm counts rows (BLHermes has one `role: tool` row per result), so
   `preserve_recent_messages: 6` pins fewer turns than in Claude Code; `jev_tail40` widens
   it to roughly lean's 25K tail and changes nothing (+1 pt).
 - Eval spend for the whole run (question generation, 634 answer/judge calls): 43.5M input

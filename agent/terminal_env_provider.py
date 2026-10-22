@@ -50,7 +50,7 @@ class TerminalEnvironmentProvider(ProviderBase):
       docker/ssh/singularity, instead of refusing.
 
     ``default_cwd`` home resolution and ``exec_prefix`` need the environment object itself, so they
-    work for in-process plugins only; under ``plugins.isolation: host`` the environment reaches Hermes
+    work for in-process plugins only; under ``plugins.isolation: host`` the environment reaches BLHermes
     as an opaque placeholder and Bot Desktop placement refuses a ``supports_streams`` backend.
     """
 

@@ -197,10 +197,10 @@ describe('resolveOutsideAsar', () => {
   it('redirects a Windows packaged path built with backslashes', () => {
     expect(
       resolveOutsideAsar(
-        'C:\\Users\\me\\AppData\\Local\\Hermes\\resources\\app.asar\\dist\\node_modules\\get-windows\\index.js'
+        'C:\\Users\\me\\AppData\\Local\\BLHermes\\resources\\app.asar\\dist\\node_modules\\get-windows\\index.js'
       )
     ).toBe(
-      'C:\\Users\\me\\AppData\\Local\\Hermes\\resources\\app.asar.unpacked\\dist\\node_modules\\get-windows\\index.js'
+      'C:\\Users\\me\\AppData\\Local\\BLHermes\\resources\\app.asar.unpacked\\dist\\node_modules\\get-windows\\index.js'
     )
   })
 

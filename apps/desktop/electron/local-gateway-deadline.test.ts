@@ -66,7 +66,7 @@ test('a stale-owner restart client that times out but obeys SIGTERM is logged an
 
 // `hermes gateway ensure` owns a 60 s startup deadline (hermes_cli/gateway_runtime.py
 // DEFAULT_ENSURE_TIMEOUT) and always answers with a protocol verdict by then. Killing the client
-// earlier turned a slow-but-valid cold start into "produced no result … Update Hermes".
+// earlier turned a slow-but-valid cold start into "produced no result … Update BLHermes".
 test('the default ensure client outlives the protocol deadline and reads a late verdict', async () => {
   vi.useFakeTimers()
 

@@ -12,7 +12,7 @@ const ROOT = 'C:\\Program Files\\WindowsApps\\NousResearch.HermesBundled_0.21.20
 const GPG_AGENT: string = `${ROOT}\\app\\tools\\git\\gpg-agent.exe`
 const PAYLOAD_PYTHON: string = `${ROOT}\\app\\tools\\python\\python.exe`
 const MAIN_EXE: string = `${ROOT}\\app\\Hermes.exe`
-const TOOLS_ROOT: string = 'C:\\Hermes\\tools'
+const TOOLS_ROOT: string = 'C:\\BLHermes\\tools'
 const STORE_NODE: string = `${TOOLS_ROOT}\\node\\node.exe`
 const DAEMON_CMDLINE: string = 'gpg-agent --daemon'
 

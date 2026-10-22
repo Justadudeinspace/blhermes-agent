@@ -48,7 +48,7 @@ def raise_if_removed(*candidates: str) -> None:
             if removed.date:
                 detail += f" (removed {removed.date})"
             raise PluginOperationError(
-                f"Plugin '{removed.name}' was removed from the Hermes plugin catalog and is blocked from "
+                f"Plugin '{removed.name}' was removed from the BLHermes plugin catalog and is blocked from "
                 f"installation: {detail}", failure_class="removed_from_catalog")
 
 
@@ -58,7 +58,7 @@ def resolve_catalog_name(identifier: str, console) -> PluginCatalogEntry:
     entry = get_live_catalog_entry(identifier)
     if entry is None:
         _fail(console, (
-            f"[red]Error:[/red] '{identifier}' is not in the Hermes plugin catalog and is not a Git URL or "
+            f"[red]Error:[/red] '{identifier}' is not in the BLHermes plugin catalog and is not a Git URL or "
             "owner/repo shorthand. Browse entries with `hermes plugins search`."))
         raise SystemExit(1)  # _fail exits; keeps type-checkers honest
     return entry
@@ -295,7 +295,7 @@ def refuse_if_installed_removed(name: str, plugin_dir) -> None:
     removed = installed_plugin_removal(name, plugin_dir)
     if removed is not None:
         raise PluginOperationError(
-            f"Plugin '{name}' was removed from the Hermes plugin catalog: "
+            f"Plugin '{name}' was removed from the BLHermes plugin catalog: "
             f"{removed.reason or 'no reason recorded'}. Remove it with `hermes plugins remove {name}`, "
             "or reinstall with `hermes plugins install <source> --force --allow-removed` if you trust it.")
 
@@ -712,7 +712,7 @@ def pin_label(entry: PluginCatalogEntry) -> str:
 def _render_entries(entries: list[PluginCatalogEntry], console) -> None:
     from hermes_cli.plugins_cmd import _table
     table = _table(((("Name", "bold")), ("Category", None), ("Tier", None), ("Description", None),
-                    ("Pinned", "dim"), ("Capabilities", "dim")), title="Hermes Plugin Catalog (curated)")
+                    ("Pinned", "dim"), ("Capabilities", "dim")), title="BLHermes Plugin Catalog (curated)")
     rank = {name: i for i, name in enumerate(CATALOG_TIERS)}
     style = {"official": "cyan", "verified": "green", "community": "magenta"}
     for e in sorted(entries, key=lambda e: (e.category, rank.get(e.tier, len(rank)), e.name)):

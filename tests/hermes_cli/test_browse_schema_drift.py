@@ -231,7 +231,7 @@ def test_session_list_reconciles_once_only_when_unowned(own_store_client, missin
     assert response.status_code == 503
     assert "gateway owns it" in response.json()["detail"]
     # A failed read is a retryable failed load naming the drift, never an empty list.
-    assert "behind this Hermes version" in sidebar["errors"][0]["error"]
+    assert "behind this BLHermes version" in sidebar["errors"][0]["error"]
     assert "sessions" not in sidebar["recents"] and sidebar["recents"]["failed"] is True
     assert path.read_bytes() == before
     assert missing_column not in _session_columns(path)
@@ -909,7 +909,7 @@ def test_legacy_gateway_holding_the_store_without_a_lock_is_not_written(tmp_path
     """alt-glitch W1: a v0.22.0 multiplex gateway keeps a named profile's state.db open without writing
     that profile's gateway.lock/gateway.pid. Browse must still treat it as the owner: no DDL, a named
     503. Plain readers (sibling browses, Desktop) are not owners, so only a holder identified as a
-    Hermes gateway process refuses."""
+    BLHermes gateway process refuses."""
     import os
     import subprocess
     import sys

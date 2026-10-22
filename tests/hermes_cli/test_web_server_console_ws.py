@@ -1,4 +1,4 @@
-"""Dashboard Hermes Console websocket tests."""
+"""Dashboard BLHermes Console websocket tests."""
 
 from __future__ import annotations
 

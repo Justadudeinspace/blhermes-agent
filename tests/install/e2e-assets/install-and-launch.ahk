@@ -197,7 +197,7 @@ if launchFound {
     ClickWithMarker(lx, ly)
     Log("FALLBACK: clicked Launch at window-relative position")
 }
-Log("Launch clicked; waiting for the Hermes desktop app window")
+Log("Launch clicked; waiting for the BLHermes desktop app window")
 
 ; WinWait returns 0 on timeout; it does not throw. The old unchecked return
 ; led to WinGetPos throwing "Target window not found." Reuse the bounded

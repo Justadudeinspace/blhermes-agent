@@ -74,7 +74,7 @@ per-record file-scan exception has no counterpart. The regression case lives in
 `apps/desktop/e2e/` and run with the same native fixture (no mock-trigger patch
 needed for this case). It keeps default's real Desktop Bot Chat lease, submits
 ordinary cron output to unowned Alpha from a separate Python producer under a
-custom Hermes root, and holds the real quiet CLI child at loopback inference.
+custom BLHermes root, and holds the real quiet CLI child at loopback inference.
 The child shim PID must match Alpha's real CLI lease; default's lease is unchanged.
 After release, Alpha has exactly one input and Desktop renders the output.
 The same case removes unused Beta and verifies delivery neither recreates Beta nor

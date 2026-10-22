@@ -369,7 +369,7 @@ def test_disabled_launch_override_does_not_hide_the_bundled_copy_from_a_secondar
 @pytest.mark.parametrize("selector", [False, True], ids=["ticket", "selector"])
 def test_bundled_plugin_the_launch_profile_disabled_still_serves_a_secondary_profile(
         daemon, tmp_path, monkeypatch, selector):
-    """Bundled plugins are Hermes code and stay in-process; the secondary profile's own lists decide,
+    """Bundled plugins are BLHermes code and stay in-process; the secondary profile's own lists decide,
     also for the first request that mounts the router, whether its grant or ``?profile=`` names it."""
     _bundled(tmp_path, monkeypatch, "bundled-probe")
     _plugins(daemon.launch, disabled=["bundled-probe"])

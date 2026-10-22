@@ -418,7 +418,7 @@ class TestDesktopSurface:
 
 
 def test_runtime_rebind_of_hermes_core_fails_admission(tmp_path):
-    """A plugin that replaces Hermes core in place fails ``no core override``: through a module
+    """A plugin that replaces BLHermes core in place fails ``no core override``: through a module
     import, a helper that ``setattr``s its parameter, a local helper returning
     ``import_module(...)`` under an alias, and a write into a core module's dict. Ordinary use of
     core (calling it, mutating its return values, its own ``tools`` package, tests) passes."""
@@ -545,9 +545,9 @@ def test_oauth_block_passes_and_a_token_url_in_code_is_only_a_warning(tmp_path):
     ({"authorize_url": "http://accounts.example.com/o/oauth2/auth"}, "authorize_url"),
     ({"authorize_url": "http://127.0.0.1:8080/auth"}, "must use https"),  # no loopback exception
     ({"token_url": "http://[::1]:8080/token"}, "must use https"),
-    ({"client_secret_env": "OPENROUTER_API_KEY"}, "Hermes uses itself"),  # would be POSTed to token_url
-    ({"client_id_env": "TELEGRAM_BOT_TOKEN"}, "Hermes uses itself"),
-    ({"client_secret_env": "MATRIX_PASSWORD"}, "Hermes uses itself"),  # platform secrets too
+    ({"client_secret_env": "OPENROUTER_API_KEY"}, "BLHermes uses itself"),  # would be POSTed to token_url
+    ({"client_id_env": "TELEGRAM_BOT_TOKEN"}, "BLHermes uses itself"),
+    ({"client_secret_env": "MATRIX_PASSWORD"}, "BLHermes uses itself"),  # platform secrets too
     ({"id": 123}, "id"),
     ({"authorize_url": "https://accounts.example.com/o/oauth2/auth#consent"}, "authorize_url"),
     ({"token_url": "https://[oauth2.example.com/token"}, "token_url"),

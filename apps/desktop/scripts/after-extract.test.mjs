@@ -30,7 +30,7 @@ test('stamps the stock electron.exe on win32 only, before it is renamed to Herme
   await afterExtract({
     appOutDir,
     electronPlatformName: 'win32',
-    packager: { appInfo: { productFilename: 'Hermes' } }
+    packager: { appInfo: { productFilename: 'BLHermes' } }
   })
   assert.deepEqual(stampExeIdentity.mock.calls, [[path.join(appOutDir, 'electron.exe'), desktopRoot]])
 
@@ -38,7 +38,7 @@ test('stamps the stock electron.exe on win32 only, before it is renamed to Herme
   await afterExtract({
     appOutDir: path.join('tmp', 'linux-unpacked'),
     electronPlatformName: 'linux',
-    packager: { appInfo: { productFilename: 'Hermes' } }
+    packager: { appInfo: { productFilename: 'BLHermes' } }
   })
   assert.equal(stampExeIdentity.mock.calls.length, 0)
 })

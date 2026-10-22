@@ -1,4 +1,4 @@
-"""Hermes CLI - Unified command-line interface for Hermes Agent."""
+"""BLHermes CLI - Unified command-line interface for BLHermes Agent."""
 
 import sys
 

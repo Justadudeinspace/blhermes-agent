@@ -363,14 +363,14 @@ def _fenced_verdict(home: Path, timeout: float) -> GatewayDiscovery:
     return GatewayDiscovery("draining", reason_code="update_paused")
 
 
-_REPLACE_FAILED_DETAIL = "an older Hermes gateway still owns this profile after a stop; run: hermes gateway stop"
+_REPLACE_FAILED_DETAIL = "an older BLHermes gateway still owns this profile after a stop; run: hermes gateway stop"
 # ``draining`` reasons after which the owner is going away by itself: its own idle exit, or the
 # older-Hermes owner this call just stopped. Ensure waits it out and starts the current owner.
 _RETIRING = frozenset({"idle_exit", "replaced"})
 
 
 def _observe_replacing_stale(home: Path, deadline: float, replaced: set[Path]) -> GatewayDiscovery:
-    """Discovery, except that a gateway an older Hermes left on this home is stopped once (like
+    """Discovery, except that a gateway an older BLHermes left on this home is stopped once (like
     ``hermes gateway stop``) and reported as retiring; a refusal keeps ``incompatible`` + its remedy."""
     from hermes_cli.gateway_runtime_service import remaining
     observed = discover_gateway_endpoint(home, timeout=remaining(deadline))
@@ -391,10 +391,10 @@ def ensure_gateway_runtime(profile_home: str | Path, *, timeout: float = DEFAULT
                            idle_exit: bool = False) -> GatewayDiscovery:
     """Ensure once; pending remains pending at deadline.
 
-    Never installs anything. The one owner it replaces is a gateway an older Hermes left running on
+    Never installs anything. The one owner it replaces is a gateway an older BLHermes left running on
     this install's own home (``incompatible``/``runtime_protocol``, the upgrade case): it is stopped
     the way ``hermes gateway stop`` stops it, once, and the current one started like any absent
-    owner. Another install's or a newer Hermes's gateway stays refused, with the reason in ``detail``
+    owner. Another install's or a newer BLHermes's gateway stays refused, with the reason in ``detail``
     (``hermes_cli.gateway_runtime_replace``).
 
     A successful service command or Popen is not session readiness. After an

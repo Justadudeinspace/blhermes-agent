@@ -283,7 +283,7 @@ async function openSignInUrl(url: string) {
 }
 
 /**
- * Drive one sign-in attempt end to end: resolve what identity this Hermes is
+ * Drive one sign-in attempt end to end: resolve what identity this BLHermes is
  * on, start the transfer, open the consent page, then poll until it resolves.
  * Safe to call again from a "Try again" button — it clears any previous timers
  * first.

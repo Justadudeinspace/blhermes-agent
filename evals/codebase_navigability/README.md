@@ -30,7 +30,7 @@ numbers. Everything here is offline and deterministic; no model calls.
 ## Usage
 
 ```bash
-# Independent benchmark environment only — never Hermes's selected environment.
+# Independent benchmark environment only — never BLHermes's selected environment.
 uv venv /tmp/hermes-navigability-bench
 source /tmp/hermes-navigability-bench/bin/activate
 uv pip install tiktoken radon

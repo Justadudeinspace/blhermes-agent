@@ -140,7 +140,7 @@ def _redact_messages_for_egress(messages: Optional[list[Any]]) -> Optional[list[
 
 
 class _StuckCallGate:
-    """Process-wide admission for one kind of external provider call, keyed by (Hermes home, provider).
+    """Process-wide admission for one kind of external provider call, keyed by (BLHermes home, provider).
 
     A new MemoryManager is built per agent, so a per-instance view would let every fresh manager start
     one more call against a hung backend and pin one more thread. Shared, the gate closes once

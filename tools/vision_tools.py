@@ -167,7 +167,7 @@ def _managed_install() -> bool:
 
 
 def _secure_cache_dir(new_subpath: str, old_name: str) -> Path:
-    """Resolve a Hermes media-cache dir, creating it owner-only (0700).
+    """Resolve a BLHermes media-cache dir, creating it owner-only (0700).
 
     A downloaded image or video is as sensitive as whatever the user pointed
     the agent at — a private attachment, an internal screenshot, a document
@@ -201,9 +201,9 @@ def _secure_cache_dir(new_subpath: str, old_name: str) -> Path:
     ``ensure_hermes_home``'s managed branch and its ``logs/curator``
     lazy-mkdir precedent.
 
-    Running it unconditionally also heals a directory an older Hermes left at
+    Running it unconditionally also heals a directory an older BLHermes left at
     0755. That retroactive tighten is safe *here* because this is
-    Hermes-private scratch that the same user re-reads in the same call —
+    BLHermes-private scratch that the same user re-reads in the same call —
     there is no user-shared content to strand. Note ``parents=True`` applies
     the mode to the leaf only, so an intermediate ``cache/`` keeps its default
     mode; it is shared with other subsystems and holds only directory names.
@@ -1107,7 +1107,7 @@ async def _materialize_video(video_url: str, task_id: Optional[str], temp_paths:
         # a caller-supplied destination (tools/image_source.py hands its
         # sibling a /tmp NamedTemporaryFile it owns the mode of), and
         # chmod-ing an arbitrary caller's parent to 0700 would be a
-        # destructive side effect on a path Hermes does not own.
+        # destructive side effect on a path BLHermes does not own.
         temp_dir = _secure_cache_dir("cache/video", "temp_video_files")
         path = temp_dir / f"temp_video_{uuid.uuid4()}.mp4"
         temp_paths.append(path)

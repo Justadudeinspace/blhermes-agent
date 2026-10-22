@@ -6,7 +6,7 @@ description: "How the messaging gateway boots, authorizes users, routes sessions
 
 # Gateway Internals
 
-The messaging gateway is the long-running process that connects Hermes to 20+ external messaging platforms through a unified architecture.
+The messaging gateway is the long-running process that connects BLHermes to 20+ external messaging platforms through a unified architecture.
 
 ## Canonical group metadata and profile discovery
 
@@ -77,7 +77,7 @@ last event of that turn. Desktop translates both paths into its existing
 `pending_submissions` queue store.
 
 A turn that was `started` when its owning gateway died is recovered by the next owner
-as `unknown`: Hermes cannot prove which side effects happened, so it neither replays
+as `unknown`: BLHermes cannot prove which side effects happened, so it neither replays
 the input nor lets the queued turns behind it run. `prompt.resolve_unknown`
 (`session:control`, params `session_id`, `admission_id`, `execution_generation`)
 acknowledges the loss: the row settles as `interrupted`, the session FIFO resumes and
@@ -86,7 +86,7 @@ row (visible in the resume/`session.info` projection), so a stale or already-res
 row is refused with `stale_generation`. Desktop shows such a row in the queue panel as
 "Turn lost during restart" with a **Discard** button; the gateway CLI exposes it as
 `/discard <admission_id>`. The lost input stays in the transcript for the user to resend; the
-discard closes it with a Hermes notice (like a failed turn), so it is never merged into the
+discard closes it with a BLHermes notice (like a failed turn), so it is never merged into the
 follower's model request.
 
 A messaging user (Telegram, Discord, ...) whose session is paused this way is told once per
@@ -346,7 +346,7 @@ works without a service, including with no messaging platforms configured.
 
 `hermes setup`, quick setup, and `hermes gateway setup` ask interactive users once:
 
-> Install the gateway service so Hermes starts automatically at login and keeps scheduled jobs and messaging available?
+> Install the gateway service so BLHermes starts automatically at login and keeps scheduled jobs and messaging available?
 
 The profile's `gateway.service_install_choice` stores `null`, `install`, or `decline`.
 An unset value is not permission to install. Declining records `decline` without creating,
@@ -589,7 +589,7 @@ gateway/platforms/                  # core base + HTTP ingress adapters
 
 **Deferred loading:** Bundled `kind: platform` plugins register cheap `register_deferred` loaders in `gateway/platform_registry.py` (via `hermes_cli/plugins.py`) so platform SDKs import only when the gateway starts, delivers, or runs setup/status — not on plain `hermes chat`. Resolution loads one adapter on lookup; full enumeration runs pending loaders only on paths that need every platform.
 
-Experimental connector-backed platforms use the generic relay adapter in `gateway/relay/` instead of a direct platform module. When `GATEWAY_RELAY_URL` or `gateway.relay_url` is configured, the gateway registers the `relay` platform, dials the connector over an outbound WebSocket, and receives `descriptor`, `inbound`, and `interrupt_inbound` frames on that same socket. The connector advertises a `CapabilityDescriptor`; Hermes can send normal outbound replies, token-less `follow_up` operations, and interrupt frames back through the relay. The source-grounded wire contract lives in [Relay ↔ Connector contract](relay-connector-contract.md).
+Experimental connector-backed platforms use the generic relay adapter in `gateway/relay/` instead of a direct platform module. When `GATEWAY_RELAY_URL` or `gateway.relay_url` is configured, the gateway registers the `relay` platform, dials the connector over an outbound WebSocket, and receives `descriptor`, `inbound`, and `interrupt_inbound` frames on that same socket. The connector advertises a `CapabilityDescriptor`; BLHermes can send normal outbound replies, token-less `follow_up` operations, and interrupt frames back through the relay. The source-grounded wire contract lives in [Relay ↔ Connector contract](relay-connector-contract.md).
 
 Adapters implement a common interface:
 - `connect()` / `disconnect()` — lifecycle management

@@ -119,7 +119,7 @@ def _search_stdout_and_limit(result: ExecuteResult) -> tuple[str, Optional[str]]
 
 
 def _bundled_rg() -> Optional[str]:
-    """Hermes's pinned ripgrep, forward-slashed for the shell transports, or None."""
+    """BLHermes's pinned ripgrep, forward-slashed for the shell transports, or None."""
     import pm
 
     try:
@@ -295,7 +295,7 @@ class SearchMixin:
             return cached
         from tools.environments.local import LocalEnvironment, _IS_WINDOWS
 
-        # A local search is Hermes's own work, so it runs the pinned ripgrep, never the
+        # A local search is BLHermes's own work, so it runs the pinned ripgrep, never the
         # first rg on the terminal PATH, where the user's tools come first.
         bundled = _bundled_rg() if isinstance(self.env, LocalEnvironment) else None
         if bundled:
