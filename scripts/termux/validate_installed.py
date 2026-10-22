@@ -1,4 +1,4 @@
-"""Exercise a freshly installed Termux bundle with networking disabled."""
+"""Offline installed-bundle checks. Does not certify a provider turn or Android UX."""
 from __future__ import annotations
 
 import json
@@ -38,13 +38,13 @@ def stop_child_tree(child: subprocess.Popen) -> None:
         raise RuntimeError(f"TUI children still alive: {[p.pid for p in descendants]}")
 
 
-def tui_smoke(launcher: Path, env: dict[str, str], cwd: Path) -> None:
+def tui_smoke(launcher: Path, env: dict[str, str], cwd: Path, columns: int = 120) -> None:
     import fcntl
     import pty
     import termios
 
     master, slave = pty.openpty()
-    fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 40, 120, 0, 0))
+    fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, columns, 0, 0))
     child = subprocess.Popen(
         [str(launcher), "--tui"], stdin=slave, stdout=slave, stderr=slave,
         cwd=cwd, env={**env, "TERM": "xterm-256color"}, start_new_session=True,
@@ -71,7 +71,7 @@ def tui_smoke(launcher: Path, env: dict[str, str], cwd: Path) -> None:
                 break
         if not ready:
             raise RuntimeError("TUI never reached its real setup screen:\n" + captured.decode(errors="replace"))
-        print("TUI_SETUP_SCREEN_OK", flush=True)
+        print(f"TUI_SETUP_SCREEN_OK columns={columns}", flush=True)
     finally:
         try:
             stop_child_tree(child)
@@ -110,13 +110,15 @@ def main() -> None:
         }
         launcher = prefix / "bin/hermes"
         run([str(launcher), "--version"], env, home)
+        run([str(launcher), "--help"], env, home)
         run([str(launcher), "chat", "--help"], env, home)
         run([str(prefix / "bin/hermes-acp"), "--check"], env, home)
         python = root / "venv/bin/python"
+        run([str(python), str(root / "app/scripts/termux/runtime_probe.py")], env, home)
         run([
             str(python), "-c",
             "import ctypes, ssl, sqlite3, bz2, lzma, zlib, hashlib, readline; "
-            "import cli, run_agent, tui_gateway.server; "
+            "import cli, run_agent, tui_gateway.server, gateway.run, tools.mcp_tool; "
             "from hermes_cli.config import detect_install_method; "
             "assert detect_install_method() == 'apt'; "
             "print('CLI_AND_STDLIB_IMPORTS_OK')",
@@ -125,6 +127,15 @@ def main() -> None:
         run([
             str(python), str(root / "app/scripts/termux/build_wheels.py"),
             "--import-modules", *natives,
+        ], env, home)
+        run([
+            str(python), "-c",
+            "from tools.skills_tool import find_all_skills; "
+            "from hermes_cli.plugins_discovery import collect_directory_manifests; "
+            "skills = find_all_skills(); plugins = collect_directory_manifests(); "
+            "assert skills, 'no bundled skills discovered'; "
+            "assert plugins, 'no bundled plugin manifests discovered'; "
+            "print('SKILL_AND_PLUGIN_MANIFEST_DISCOVERY_OK', len(skills), len(plugins))",
         ], env, home)
         node = root / "tools/node" / prefix.relative_to("/") / "bin/node"
         run([str(node), "--version"], env, home)
@@ -145,6 +156,8 @@ def main() -> None:
         result = subprocess.run([str(launcher), "update"], env=env, cwd=home, capture_output=True, text=True, encoding="utf-8", timeout=60, check=False)
         validate_update_refusal(root / "app", result)
         tui_smoke(launcher, env, home)
+        tui_smoke(launcher, env, home, columns=40)
+        print("LIVE_PROVIDER_TOOLS_INTEGRATIONS_AND_DEVICE_UX_NOT_TESTED", flush=True)
         print("INSTALLED_BUNDLE_VALIDATION_OK", flush=True)
 
 

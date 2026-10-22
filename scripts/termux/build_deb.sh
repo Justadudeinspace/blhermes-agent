@@ -58,9 +58,10 @@ done
 { [ -z "$TAG" ] || [ -z "$COMMIT_MODE" ]; } || usage
 [ -z "$RELEASE_COMMIT" ] || { [ -n "$TAG" ] && [ -z "$COMMIT_MODE" ]; } || usage
 
-for tool in python3 git docker dpkg-deb jq; do
+for tool in python3 git docker dpkg-deb jq readelf; do
     command -v "$tool" >/dev/null || fail "missing tool: $tool"
 done
+docker info >/dev/null 2>&1 || fail "Docker daemon unavailable; use a native aarch64 Linux build host with Docker access"
 
 DIGEST="$(cd "$REPO_ROOT" && python3 -c 'from pm.lock import termux_docker_digest; print(termux_docker_digest())')"
 [ -n "$DIGEST" ] || fail "termux-docker digest missing from pm/lock.json"
@@ -233,7 +234,7 @@ cat > "$STAGE/DEBIAN/control" <<EOF
 Package: $PKG
 Version: $DEB_VERSION
 Architecture: aarch64
-Maintainer: Nous Research
+Maintainer: BLHermes maintainers
 Description: BLHermes Agent CLI for Termux (self-contained bundled python/node/venv)
 Installed-Size: $(du -sk "$STAGE/$ROOT_IN_DEB" | cut -f1)
 EOF
@@ -246,6 +247,8 @@ DEB="$OUT_ABS/${PKG}_${DEB_VERSION}_aarch64.deb"
 rm -f "$DEB"
 # Use xz for both archive members so Termux dpkg can extract the package.
 dpkg-deb --build -Zxz --root-owner-group "$STAGE" "$DEB" || fail "dpkg-deb --build failed"
+python3 "$HERE/audit_deb.py" "$DEB" --version "$DEB_VERSION" --report "$DEB.audit.json" \
+    || fail "host artifact inspection failed (not Android runtime validation)"
 rm -rf "$STAGE"
 [ -f "$DEB" ] || fail "dpkg-deb did not produce $DEB"
 

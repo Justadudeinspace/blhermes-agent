@@ -66,7 +66,9 @@ jobs:
             tests/scripts/test_termux_build_wheels.py \
             tests/scripts/test_termux_wheelhouse_cache.py tests/scripts/test_termux_runtime_libs.py \
             tests/scripts/test_archive_inputs.py \
-            tests/scripts/test_termux_launchers.py tests/pm/test_pm_bionic.py \
+            tests/scripts/test_termux_launchers.py tests/scripts/test_termux_artifact_audit.py \
+            tests/scripts/test_termux_runtime_probe.py \
+            tests/scripts/test_termux_build_driver.py tests/pm/test_pm_bionic.py \
             tests/pm/test_stage_only.py tests/pm/test_deb_safety.py tests/scripts/test_stage_apt_repo.py \
             tests/scripts/test_run_tests_shell.py
 

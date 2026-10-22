@@ -35,7 +35,7 @@ actual="$(dpkg-query -W -f='${Version}' hermes-agent)"
 root="$PREFIX/lib/hermes-agent"
 export LD_LIBRARY_PATH="$root/tools/python$PREFIX/lib:$root/tools/node$PREFIX/lib:$root/tools/ffmpeg$PREFIX/lib:$root/runtime-libs/lib:$PREFIX/lib"
 export PYTHONPATH="$root/app"
-"$root/venv/bin/python" "$ctmp/validate_installed.py"
+"$root/venv/bin/python" -B "$ctmp/validate_installed.py"
 printf 'SIGNED_APT_INSTALL_OK %s\n' "$actual"
 if [ -f /previous.deb ]; then
     printf 'SIGNED_APT_UPGRADE_OK %s -> %s\n' "$previous" "$actual"

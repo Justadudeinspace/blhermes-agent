@@ -181,6 +181,7 @@ case "$ARCH" in
     aarch64|arm64) ;;
     *) fail "refusing to build on non-aarch64 host (uname -m: $ARCH)" ;;
 esac
+docker info >/dev/null 2>&1 || fail "Docker daemon unavailable; use a native aarch64 Linux build host with Docker access"
 
 # Check source identity before writing build output.
 if [ -n "$RELEASE_COMMIT" ]; then
