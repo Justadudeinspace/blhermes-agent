@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import select
 import struct
+import sys
 import subprocess
 import tempfile
 import time
@@ -17,6 +18,7 @@ def run(argv: list[str], env: dict[str, str], cwd: Path) -> subprocess.Completed
     print("+", " ".join(argv), flush=True)
     print(result.stdout, result.stderr, flush=True)
     result.check_returncode()
+    print("PASS", argv[0], flush=True)
     return result
 
 
@@ -38,13 +40,13 @@ def stop_child_tree(child: subprocess.Popen) -> None:
         raise RuntimeError(f"TUI children still alive: {[p.pid for p in descendants]}")
 
 
-def tui_smoke(launcher: Path, env: dict[str, str], cwd: Path, columns: int = 120) -> None:
+def tui_smoke(launcher: Path, env: dict[str, str], cwd: Path, columns: int = 120, rows: int = 30) -> None:
     import fcntl
     import pty
     import termios
 
     master, slave = pty.openpty()
-    fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, columns, 0, 0))
+    fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", rows, columns, 0, 0))
     child = subprocess.Popen(
         [str(launcher), "--tui"], stdin=slave, stdout=slave, stderr=slave,
         cwd=cwd, env={**env, "TERM": "xterm-256color"}, start_new_session=True,
@@ -90,13 +92,17 @@ def validate_update_refusal(project_root: Path, result: subprocess.CompletedProc
     print("COMMIT_BUILD_UPDATE_REFUSAL_OK" if commit_build else "APT_UPDATE_REFUSAL_OK", flush=True)
 
 
-def main() -> None:
-    prefix = Path(os.environ["PREFIX"])
+def validate() -> None:
+    prefix = Path(os.environ.get("PREFIX") or "/data/data/com.termux/files/usr")
+    if sys.platform != "android" or not hasattr(sys, "getandroidapilevel"):
+        raise RuntimeError("requires installed Android/Bionic Python; host execution is not acceptance")
+    if prefix != Path("/data/data/com.termux/files/usr"):
+        raise RuntimeError("requires the standard com.termux prefix")
     root = prefix / "lib/hermes-agent"
     with tempfile.TemporaryDirectory(prefix="hermes-install-proof-", dir=prefix / "tmp") as tmp:
         home = Path(tmp)
         env = {
-            "PREFIX": str(prefix), "HOME": str(home), "HERMES_HOME": str(home / "state"),
+            "PREFIX": str(prefix), "TMPDIR": str(prefix / "tmp"), "HOME": str(home), "HERMES_HOME": str(home / "state"),
             "PATH": str(prefix / "bin"), "TERM": "xterm-256color", "LANG": "C.UTF-8",
             "LD_LIBRARY_PATH": ":".join((
                 str(root / "tools/python" / prefix.relative_to("/") / "lib"),
@@ -108,6 +114,10 @@ def main() -> None:
             "PYTHONPATH": str(root / "app"),
             "PYTHONPYCACHEPREFIX": str(home / "pycache"),
         }
+        metadata = run([str(prefix / "bin/dpkg-query"), "-W",
+                        "-f=${Package} ${Version} ${Architecture}", "hermes-agent"], env, home).stdout.split()
+        if len(metadata) != 3 or metadata[0] != "hermes-agent" or metadata[2] != "aarch64":
+            raise RuntimeError("installed package identity/architecture mismatch")
         launcher = prefix / "bin/hermes"
         run([str(launcher), "--version"], env, home)
         run([str(launcher), "--help"], env, home)
@@ -121,8 +131,18 @@ def main() -> None:
             "import cli, run_agent, tui_gateway.server, gateway.run, tools.mcp_tool; "
             "from hermes_cli.config import detect_install_method; "
             "assert detect_install_method() == 'apt'; "
+            "from pathlib import Path; "
+            f"root=Path({str(root)!r}); "
+            "assert all(Path(m.__file__).resolve().is_relative_to(root) for m in "
+            "(cli, run_agent, tui_gateway.server, gateway.run, tools.mcp_tool)); "
             "print('CLI_AND_STDLIB_IMPORTS_OK')",
         ], env, home)
+        run([str(python), "-c",
+             "import os, subprocess, sys; "
+             "from tools.code_execution_env import _scrub_child_env; "
+             "subprocess.run([sys.executable, '-c', 'import ssl, ctypes, sqlite3'], "
+             "env=_scrub_child_env(dict(os.environ)), check=True, timeout=30); "
+             "print('FILTERED_CHILD_RUNTIME_OK')"], env, home)
         natives = json.loads((root / "native-wheels.json").read_text(encoding="utf-8-sig"))
         run([
             str(python), str(root / "app/scripts/termux/build_wheels.py"),
@@ -137,6 +157,7 @@ def main() -> None:
             "assert plugins, 'no bundled plugin manifests discovered'; "
             "print('SKILL_AND_PLUGIN_MANIFEST_DISCOVERY_OK', len(skills), len(plugins))",
         ], env, home)
+        run([str(python), str(root / "app/scripts/termux/mcp_probe.py")], env, home)
         node = root / "tools/node" / prefix.relative_to("/") / "bin/node"
         run([str(node), "--version"], env, home)
         run([str(node), str(root / "tools/npm/lib/node_modules/npm/bin/npm-cli.js"), "--version"], env, home)
@@ -155,10 +176,18 @@ def main() -> None:
         ], env, home)
         result = subprocess.run([str(launcher), "update"], env=env, cwd=home, capture_output=True, text=True, encoding="utf-8", timeout=60, check=False)
         validate_update_refusal(root / "app", result)
-        tui_smoke(launcher, env, home)
-        tui_smoke(launcher, env, home, columns=40)
-        print("LIVE_PROVIDER_TOOLS_INTEGRATIONS_AND_DEVICE_UX_NOT_TESTED", flush=True)
+        for columns, rows in ((120, 30), (100, 30), (80, 24), (60, 24), (50, 20), (40, 20)):
+            tui_smoke(launcher, env, home, columns=columns, rows=rows)
+        print("SKIP LIVE_PROVIDER_TOOLS_INTEGRATIONS_AND_DEVICE_UX: operator acceptance required", flush=True)
         print("INSTALLED_BUNDLE_VALIDATION_OK", flush=True)
+
+
+def main() -> None:
+    try:
+        validate()
+    except (RuntimeError, OSError, ValueError, AssertionError, subprocess.SubprocessError) as exc:
+        print(f"FAIL INSTALLED_BUNDLE_VALIDATION: {exc}", file=sys.stderr, flush=True)
+        raise SystemExit(1) from None
 
 
 if __name__ == "__main__":

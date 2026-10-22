@@ -61,8 +61,12 @@ def read_ar_entries(data: bytes):
     if data[:8] != b"!<arch>\n":
         raise StageError("not an ar archive")
     pos = 8
-    while pos + 60 <= len(data):
+    while pos < len(data):
+        if pos + 60 > len(data):
+            raise StageError("truncated ar header")
         header = data[pos : pos + 60]
+        if header[58:60] != b"`\n":
+            raise StageError("bad ar header terminator")
         name = header[0:16].decode("ascii", "replace").strip()
         size_field = header[48:58].decode("ascii", "replace").strip()
         try:
@@ -70,6 +74,8 @@ def read_ar_entries(data: bytes):
         except ValueError:
             raise StageError(f"bad ar member size {size_field!r}")
         pos += 60
+        if size < 0 or pos + size + (size % 2) > len(data):
+            raise StageError("invalid or truncated ar payload")
         yield name, size, data[pos : pos + size]
         pos += size + (size % 2)  # members are 2-byte aligned
 
@@ -255,6 +261,8 @@ def stage(
                 "(published apt assets are immutable)"
             )
         arch = fields["Architecture"]
+        if arch not in (ARCH, "all"):
+            raise StageError(f"{deb.name}: architecture {arch} does not belong in {ARCH} repository")
         prefix = f"{pool_subdir}/" if pool_subdir else ""
         target = out_dir / "pool" / pool_subdir / deb.name[0].lower() / deb.name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -269,6 +277,7 @@ def stage(
                 "Package": fields["Package"],
                 "Version": fields["Version"],
                 "Architecture": arch,
+                **{name: fields[name] for name in ("Depends", "Pre-Depends", "Recommends", "Suggests", "Conflicts", "Replaces", "Breaks", "Provides") if name in fields},
                 "Maintainer": fields.get("Maintainer", "BLHermes Agent <noreply@nousresearch.com>"),
                 "Installed-Size": fields.get("Installed-Size", "0"),
                 "Description": fields.get("Description", "BLHermes Agent"),
@@ -535,7 +544,7 @@ def main(argv: list | None = None) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     try:
         return stage(args.pool, args.out, args.suite, args.gpg_key_file, args.pool_subdir)
-    except StageError as e:
+    except (StageError, OSError, ValueError, tarfile.TarError, lzma.LZMAError) as e:
         die(str(e))
 
 

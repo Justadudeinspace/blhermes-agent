@@ -3,6 +3,10 @@ from __future__ import annotations
 
 import asyncio
 import ctypes
+import bz2
+import hashlib
+import lzma
+import zlib
 import json
 import locale
 import multiprocessing
@@ -25,6 +29,26 @@ async def async_value() -> str:
     return await asyncio.to_thread(lambda: "asyncio OK")
 
 
+def certificate_probe() -> dict:
+    try:
+        certificates = ssl.create_default_context().cert_store_stats()
+    except (OSError, ssl.SSLError) as exc:
+        raise RuntimeError("TLS trust store unavailable; reinstall Termux ca-certificates and check SSL_CERT_FILE/SSL_CERT_DIR.") from exc
+    if not certificates["x509_ca"]:
+        raise RuntimeError("no trusted TLS certificates; reinstall Termux ca-certificates and check SSL_CERT_FILE/SSL_CERT_DIR")
+    return certificates
+
+
+def stdlib_probe() -> None:
+    import readline
+
+    text = "Android Unicode: café 🦀".encode()
+    for codec in (bz2, lzma, zlib):
+        assert codec.decompress(codec.compress(text)) == text
+    assert hashlib.sha256(text).digest() == hashlib.new("sha256", text).digest()
+    assert callable(readline.get_current_history_length)
+
+
 def probe(root: Path) -> dict:
     if sys.platform != "android" or not hasattr(sys, "getandroidapilevel"):
         raise RuntimeError("requires packaged Android/Bionic Python; a Linux host is not acceptance")
@@ -32,16 +56,18 @@ def probe(root: Path) -> dict:
         raise RuntimeError(f"interpreter escaped package: {sys.prefix}, {sys.base_prefix}")
     if not any("site-packages" in path and Path(path).is_relative_to(root) for path in sys.path):
         raise RuntimeError("packaged site-packages missing")
-    certificates = ssl.create_default_context().cert_store_stats()
-    if not certificates["x509_ca"]:
-        raise RuntimeError("no trusted TLS certificates; reinstall Termux ca-certificates")
+    certificates = certificate_probe()
+    stdlib_probe()
     ctypes.CDLL("libc.so")
     text = "Android Unicode: café 🦀"
     with tempfile.TemporaryDirectory(prefix="hermes-runtime-") as tmp:
         file = Path(tmp) / "café.txt"
         file.write_text(text, encoding="utf-8")
         assert file.read_text(encoding="utf-8-sig") == text
-    state = Path(os.environ["HERMES_HOME"])
+    value = os.environ.get("HERMES_HOME", "")
+    if not value or not Path(value).is_absolute():
+        raise RuntimeError("HERMES_HOME must select an absolute writable isolated acceptance directory")
+    state = Path(value)
     state.mkdir(parents=True, exist_ok=True, mode=0o700)
     database = state / "acceptance.sqlite"
     with sqlite3.connect(database) as db:
@@ -84,5 +110,10 @@ def probe(root: Path) -> dict:
 
 
 if __name__ == "__main__":
-    print(json.dumps(probe(Path(os.environ["PREFIX"]) / "lib/hermes-agent"), indent=2))
+    try:
+        prefix = os.environ.get("PREFIX") or "/data/data/com.termux/files/usr"
+        print(json.dumps(probe(Path(prefix) / "lib/hermes-agent"), indent=2))
+    except (RuntimeError, OSError, AssertionError) as exc:
+        print(f"BIONIC_RUNTIME_CONTRACTS_FAIL: {exc}", file=sys.stderr)
+        raise SystemExit(1) from None
     print("BIONIC_RUNTIME_CONTRACTS_OK")

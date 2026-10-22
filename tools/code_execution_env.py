@@ -116,7 +116,9 @@ def _scrub_child_env(source_env, is_passthrough=None, is_windows=None, toolchain
         for key in (DELEGATED_CHILD_ENV_MARKER, "HERMES_KANBAN_DB", "HERMES_KANBAN_BOARD"):
             if key in scoped:
                 scrubbed[key] = scoped[key]
-    return delegated_child_subprocess_env(scrubbed)
+    from hermes_platform.termux import packaged_child_environment
+
+    return delegated_child_subprocess_env({**packaged_child_environment(), **scrubbed})
 
 
 def _build_child_env(*, rpc_endpoint: str, rpc_token: str, tmpdir: str,

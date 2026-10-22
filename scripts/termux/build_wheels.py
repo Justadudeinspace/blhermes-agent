@@ -39,6 +39,13 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
+def export_runtime_requirements(source: Path, output: Path) -> None:
+    from pm import export_requirements
+
+    # Baseline includes MCP, cron and ACP; optional native integrations remain opt-in.
+    export_requirements(source, output, extras=["termux"], explicit=True)
+
+
 def normalize_reqs(export: Path, lock: Path, resolved: Path) -> None:
     """Retain both the build source and the locked offline wheel version."""
     from packaging.requirements import Requirement
@@ -339,6 +346,10 @@ def import_native_modules(build_set: list[str]) -> None:
         # DeferredError that only fires on first use. Import the C
         # extension directly so the dlopen itself is what's proven.
         "pillow-heif": "_pillow_heif",
+        "cryptography": "cryptography.hazmat.bindings._rust",
+        "multidict": "multidict._multidict", "yarl": "yarl._quoting_c",
+        "frozenlist": "frozenlist._frozenlist", "aiohttp": "aiohttp._http_parser",
+        "markupsafe": "markupsafe._speedups", "regex": "regex._regex",
     }
     for name in build_set:
         module = modules.get(name, name.replace("-", "_"))
@@ -378,6 +389,9 @@ def wheelhouse_gates(resolved: Path, wheelhouse: Path, build_set: list[str]) -> 
 
 
 def main() -> int:
+    if sys.argv[1:2] == ["--export"]:
+        export_runtime_requirements(*(Path(value) for value in sys.argv[2:]))
+        return 0
     if sys.argv[1:2] == ["--normalize"]:
         normalize_reqs(*(Path(value) for value in sys.argv[2:]))
         return 0

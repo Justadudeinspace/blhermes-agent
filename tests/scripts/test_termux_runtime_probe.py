@@ -19,3 +19,31 @@ def test_glibc_interpreter_cannot_certify_android_runtime(tmp_path):
     assert "requires packaged Android/Bionic Python" in result.stderr
     assert "BIONIC_RUNTIME_CONTRACTS_OK" not in result.stdout
     assert not list(prefix.iterdir())
+
+
+def test_tls_configuration_errors_are_actionable(monkeypatch):
+    import ssl
+    from scripts.termux.runtime_probe import certificate_probe
+
+    def unavailable():
+        raise ssl.SSLError('bad certificate file')
+
+    monkeypatch.setattr(ssl, 'create_default_context', unavailable)
+    with pytest.raises(RuntimeError, match='ca-certificates.*SSL_CERT_FILE'):
+        certificate_probe()
+
+
+def test_empty_ca_store_is_not_a_tls_pass(monkeypatch):
+    import ssl
+    from types import SimpleNamespace
+    from scripts.termux.runtime_probe import certificate_probe
+
+    monkeypatch.setattr(ssl, 'create_default_context', lambda: SimpleNamespace(cert_store_stats=lambda: {'x509_ca': 0}))
+    with pytest.raises(RuntimeError, match='no trusted TLS certificates'):
+        certificate_probe()
+
+
+def test_compression_hash_and_readline_runtime_contract():
+    from scripts.termux.runtime_probe import stdlib_probe
+
+    stdlib_probe()

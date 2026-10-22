@@ -235,4 +235,4 @@ MIT — تفصیلات کے لیے [LICENSE](LICENSE) دیکھیں۔
 
 [نوس ریسرچ (Nous Research)](https://nousresearch.com) کی جانب سے تیار کردہ۔
 
-</div>
+</div> [فون کی جانچ سے پہلے تصدیق اور upstream Hermes سے منتقلی](BLHERMES_PRE_DEVICE_COMPLETE.md).

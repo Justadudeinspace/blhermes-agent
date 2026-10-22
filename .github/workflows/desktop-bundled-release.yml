@@ -2203,7 +2203,7 @@ jobs:
               "termux/termux-docker@$digest" bash /tmp/check-apt.sh "hermes-$CHANNEL" "$version"
           fi
 
-          args=(--include 'deb/*.deb' --include 'deb/*.deb.audit.json' --include 'apt/**/*')
+          args=(--include 'deb/*.deb' --include 'deb/*.deb.audit.json' --include 'deb/*.deb.release.json' --include 'apt/**/*')
           if [ "$RELEASE_PHASE" = candidate ]; then
             python -m scripts.bundles.release_artifacts record --platform termux --arch aarch64 \
               --root termux-build --tag "$HERMES_PAYLOAD_TAG" --commit "$RELEASE_COMMIT" \

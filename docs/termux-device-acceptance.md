@@ -44,7 +44,7 @@ success from another test.
 | 9 — State persistence | Exit/restart `hermes`, inspect/resume the test conversation and provider selection. | State belongs to the explicit `HERMES_HOME`; conversation/config and proof file survive. | Redacted session identifier and observed loss/error. |
 | 10 — Skill | `hermes skills list`; invoke one reviewed Android-compatible bundled skill in a conversation. | Readable metadata, actual skill behavior; user skill directory writable when used. | Skill name, metadata/load error, tool result. |
 | 11 — Plugin infrastructure | `hermes plugins list`; review and exercise one compatible plugin through the documented plugin CLI; restart. Deliberately try an unsupported integration in a disposable profile. | Discovery/persistence works; unsupported platform fails clearly. This does not certify all plugins. | Plugin/version, platform decision and redacted failure. |
-| 12 — MCP | Configure a maintainer-selected, reviewed, pinned read-only loopback MCP fixture using normal config; invoke its harmless tool, cancel/timeout, exit. | Discovery and real result, bounded errors, child cleanup. BLOCKED until a concrete fixture is supplied. | Fixture/version, bind address, redacted logs and process list. |
+| 12 — MCP | Configure a maintainer-selected, reviewed, pinned read-only loopback MCP fixture using normal config; invoke its harmless tool, cancel/timeout, exit. | Discovery and real result, bounded errors, child cleanup. Use the bundled `scripts/termux/mcp_fixture.py` (`acceptance_ping` returns a constant; no file/network access). The installed validator exercises its real stdio handshake/tool call and shutdown. | Fixture/version, bind address, redacted logs and process list. |
 | 13 — Gateway | `hermes gateway setup`; configure one adapter with explicit sender allowlist/authentication; `hermes gateway run`. Exchange authorized test message, reject unauthorized sender, Ctrl+C. | Expected local listeners only, authorization enforced, clean shutdown. No systemd assumption. | Redacted startup/shutdown logs, listener addresses, child list. |
 | 14 — Restart | Close/reopen Termux and run `hermes`; background/resume the app and repeat a turn. | Profile retained; lifecycle interruption recovers clearly. Android may kill the process; continuous service is not promised. | Lifecycle sequence, persisted-state result and startup errors. |
 | 15 — Update | `hermes update` must refuse runtime replacement. With two genuine compatible candidates and an independently verified BLHermes signed test feed: `pkg update; pkg upgrade hermes-agent`; rerun test 3 and a real turn. | Refusal first; actual N→N+1 replacement preserves usable state. BLOCKED without two versions/feed; reinstall is not an upgrade. | Both versions/hashes, signature/APT logs, validator and state results. |
@@ -92,3 +92,25 @@ A maintainer must reconcile all twenty results against the release gates in
 [the engineering handoff](../BLHERMES_TERMUX_RELEASE.md). Static/host/mock tests
 are not device passes. Public distribution additionally requires BLHermes-owned
 signing/feed infrastructure and a real signed upgrade acceptance receipt.
+
+## Automated offline driver and failure bundle
+
+Before the manual provider/lifecycle tests, use the installed validator's library
+environment above and run:
+
+```sh
+PYTHONPATH="$root/app" \
+LD_LIBRARY_PATH="$root/tools/python$PREFIX/lib:$root/tools/node$PREFIX/lib:$root/tools/ffmpeg$PREFIX/lib:$root/runtime-libs/lib:$PREFIX/lib" \
+"$root/venv/bin/python" -B "$root/app/scripts/termux/device_acceptance.py" \
+  --safe --output "$HOME/blhermes-acceptance/acceptance.json"
+```
+
+This runs the full installed validator (including all six terminal sizes:
+120×30, 100×30, 80×24, 60×24, 50×20, 40×20) in isolated state. The JSON has separate
+PASS / FAIL / SKIP rows; a failure exits nonzero. It never removes packages,
+starts a configured gateway, makes a paid turn, reads private logs or enters
+credentials. Review the read-only upstream source warnings before APT operations.
+Reuse the same one-step driver to collect safe failure facts with a new filename.
+Run the standalone validator when detailed command output is needed; review that
+output locally before sharing. Android keyboard/rotation/lifecycle, real streaming,
+authenticated messaging and signed upgrades remain the manual worksheet's job.

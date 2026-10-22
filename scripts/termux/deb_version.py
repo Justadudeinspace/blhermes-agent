@@ -20,6 +20,7 @@ this instead of re-typing a case statement.
 from __future__ import annotations
 
 import re
+from datetime import datetime
 import sys
 
 _TAG_RE = re.compile(
@@ -35,6 +36,11 @@ def _match_tag(tag: str) -> re.Match[str]:
             f"malformed release tag {tag!r}: expected v<MAJOR>.<MINOR>.<PATCH> "
             "or v<MAJOR>.<MINOR>.<PATCH>+canary.<UTC timestamp>"
         )
+    if m.group("ts"):
+        try:
+            datetime.strptime(m.group("ts"), "%Y%m%dT%H%M%SZ")
+        except ValueError as exc:
+            raise ValueError("canary tag must contain a valid UTC calendar timestamp") from exc
     return m
 
 

@@ -87,3 +87,10 @@ def test_dpkg_orders_canary_and_numeric_versions():
     versions = list(map(deb_version_for_tag, tags))
     for earlier, later in itertools.pairwise(versions):
         subprocess.run(["dpkg", "--compare-versions", earlier, "lt", later], check=True)
+
+
+@pytest.mark.parametrize('timestamp', ['20260230T000000Z', '20261301T000000Z', '20260101T240000Z'])
+def test_canary_calendar_values_must_be_real(timestamp):
+    for mapping in (deb_version_for_tag, channel_for_tag):
+        with pytest.raises(ValueError, match='valid UTC calendar'):
+            mapping('v1.2.3+canary.' + timestamp)

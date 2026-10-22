@@ -32,7 +32,30 @@ def posix_launcher(name: str, entry: str, *, python: str, repo: str, site: str, 
     bionic = target.endswith("-bionic")
     header = "#!/data/data/com.termux/files/usr/bin/sh" if bionic else "#!/usr/bin/env bash"
     extra = ""
+    environment = ""
     if bionic:
+        environment = '''PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
+[ "$PREFIX" = /data/data/com.termux/files/usr ] || { printf '%s\\n' 'Unsupported PREFIX; use standard com.termux private storage.' >&2; exit 2; }
+case "${HOME:-}" in
+    /*) ;;
+    *) printf '%s\\n' 'HOME must be an absolute private Termux directory.' >&2; exit 2 ;;
+esac
+case "${HERMES_HOME:-$HOME/.hermes}" in
+    /*) ;;
+    *) printf '%s\\n' 'HERMES_HOME must be an absolute private-storage directory.' >&2; exit 2 ;;
+esac
+TMPDIR="${TMPDIR:-$PREFIX/tmp}"
+case "$TMPDIR" in
+    /*) ;;
+    *) printf '%s\\n' 'TMPDIR must be an absolute writable directory.' >&2; exit 2 ;;
+esac
+[ -d "$TMPDIR" ] && [ -w "$TMPDIR" ] || { printf '%s\\n' 'TMPDIR is unavailable; create a writable private directory.' >&2; exit 2; }
+PATH="${PATH:-$PREFIX/bin}"
+SHELL="${SHELL:-$PREFIX/bin/sh}"
+LANG="${LANG:-C.UTF-8}"
+TERM="${TERM:-xterm-256color}"
+export PREFIX HOME TMPDIR PATH SHELL LANG TERM
+'''
         extra = '''PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 export PREFIX
 export LD_LIBRARY_PATH="$root/tools/python/data/data/com.termux/files/usr/lib:$root/tools/node/data/data/com.termux/files/usr/lib:$root/tools/ffmpeg/data/data/com.termux/files/usr/lib:$root/runtime-libs/lib:$PREFIX/lib"
@@ -49,7 +72,7 @@ export PATH="$root/tools/npm/bin:$root/tools/node/data/data/com.termux/files/usr
     )
     return f'''{header}
 set -eu
-self="$0"
+{environment}self="$0"
 while [ -L "$self" ]; do
     target="$(readlink "$self")"
     case "$target" in

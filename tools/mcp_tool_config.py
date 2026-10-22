@@ -205,6 +205,9 @@ def _build_safe_env(user_env: Optional[dict]) -> dict:
     env = {
         key: value for key, value in os.environ.items()
         if key in _SAFE_ENV_KEYS or key.upper() in _SAFE_ENV_KEYS_CASE_INSENSITIVE or key.startswith("XDG_")}
+    from hermes_platform.termux import packaged_child_environment
+
+    env.update(packaged_child_environment())
     # Source-tagged names are process-wide (any profile's hydration tags them) while os.environ
     # holds only the LAUNCH profile's values, so the value must come from the active profile's
     # secret scope; a profile that lacks the name gets nothing, never another profile's token.

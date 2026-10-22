@@ -25,12 +25,36 @@ LAUNCHERS = {"bin/hermes", "bin/hermes-agent", "bin/hermes-acp"}
 
 def checked_name(name: str) -> str:
     path = PurePosixPath(name)
-    if path.is_absolute() or ".." in path.parts:
+    if not name or "\x00" in name or path.is_absolute() or ".." in path.parts:
         raise ValueError(f"unsafe archive path: {name}")
     return str(path)
 
 
-def elf_facts(path: Path, executable: bool = False) -> tuple[set[str], set[str]]:
+def valid_search_path(entry: str, origin_dir: str = ROOT) -> bool:
+    for origin in ("$ORIGIN", "${ORIGIN}"):
+        if entry == origin or entry.startswith(origin + "/"):
+            resolved = posixpath.normpath(posixpath.join(origin_dir, entry[len(origin):].lstrip("/")))
+            return resolved == ROOT or resolved.startswith(ROOT + "/")
+    return entry.startswith("/" + PREFIX + "/") and ".." not in PurePosixPath(entry).parts
+
+
+def validate_links(links: dict[str, str], names: set[str]) -> None:
+    for name, target in links.items():
+        seen = {name}
+        while target in links:
+            if target in seen:
+                raise ValueError(f"cyclic packaged link: {name}")
+            seen.add(target)
+            target = links[target]
+        if target not in names:
+            raise ValueError(f"dangling packaged link: {name} -> {target}")
+    # A tar extractor must not traverse a symlink installed by an earlier member.
+    for name in names:
+        if any(str(parent) in links for parent in PurePosixPath(name).parents):
+            raise ValueError(f"archive member beneath link: {name}")
+
+
+def elf_facts(path: Path, executable: bool = False, allow_static: bool = False, origin_dir: str = ROOT) -> tuple[set[str], set[str]]:
     result = subprocess.run(["readelf", "-W", "-h", "-l", "-d", "-V", str(path)],
                             capture_output=True, text=True, check=True, timeout=30)
     data = result.stdout
@@ -40,15 +64,20 @@ def elf_facts(path: Path, executable: bool = False) -> tuple[set[str], set[str]]
         raise ValueError("glibc linkage in Android payload")
     interpreters = re.findall(r"Requesting program interpreter: (.*?)\]", data)
     if executable and not interpreters:
-        raise ValueError("runtime executable lacks Android dynamic interpreter")
+        static = (allow_static and re.search(r"Type:\s+EXEC", data)
+                  and "There is no dynamic section" in data and re.search(r"^\s*LOAD\s", data, re.MULTILINE))
+        if not static:
+            raise ValueError("runtime executable lacks Android dynamic interpreter")
     if any(value != "/system/bin/linker64" for value in interpreters):
         raise ValueError(f"wrong Android ELF interpreter: {interpreters}")
     for paths in re.findall(r"\((?:RUNPATH|RPATH)\).*?\[(.*?)\]", data):
         for entry in paths.split(":"):
-            if not (entry.startswith("$ORIGIN") or entry.startswith("${ORIGIN}")
-                    or entry.startswith("/" + PREFIX + "/")):
+            if not valid_search_path(entry, origin_dir):
                 raise ValueError(f"host/relative ELF search path: {entry!r}")
     needed = set(re.findall(r"\(NEEDED\).*?\[(.*?)\]", data))
+    glibc = needed & {"libc.so.6", "libm.so.6", "libdl.so.2", "libpthread.so.0", "librt.so.1", "libstdc++.so.6"}
+    if glibc:
+        raise ValueError(f"glibc dependencies in Android payload: {sorted(glibc)}")
     sonames = set(re.findall(r"\(SONAME\).*?\[(.*?)\]", data))
     return needed, sonames
 
@@ -62,13 +91,15 @@ def inspect_member(archive, member, scratch, names, sizes, links, needed_by, pro
     if name in names:
         raise ValueError(f"duplicate archive path: {name}")
     names.add(name)
+    if not member.isdir() and not name.startswith(ROOT + "/"):
+        raise ValueError(f"payload outside application root: {name}")
     if member.mode & 0o6000:
         raise ValueError(f"setuid/setgid payload: {name}")
     if member.issym() or member.islnk():
         target = member.linkname
         resolved = posixpath.normpath(posixpath.join(posixpath.dirname(name), target)) if member.issym() else checked_name(target)
         if target.startswith("/"):
-            resolved = target.lstrip("/")
+            resolved = posixpath.normpath(target).lstrip("/")
         if not resolved.startswith(PREFIX + "/"):
             raise ValueError(f"link escapes prefix: {name} -> {target}")
         links[name] = resolved
@@ -91,7 +122,7 @@ def inspect_member(archive, member, scratch, names, sizes, links, needed_by, pro
                 while block := source.read(1 << 20):
                     output.write(block)
             try:
-                needed, sonames = elf_facts(scratch, executable=relative in NATIVE_PROGRAMS)
+                needed, sonames = elf_facts(scratch, executable=relative in NATIVE_PROGRAMS, allow_static=relative == "tools/ripgrep/rg", origin_dir=posixpath.dirname(name))
             except (ValueError, subprocess.CalledProcessError) as exc:
                 raise ValueError(f"{name}: {exc}") from exc
             providers.update(sonames | {PurePosixPath(name).name})
@@ -127,10 +158,12 @@ def audit(deb: Path, expected_version: str | None = None) -> dict:
         if process.poll() is None:
             process.terminate()
         process.wait(timeout=30)
+    validate_links(links, names)
     for name, target in links.items():
-        if target not in names:
-            raise ValueError(f"dangling packaged link: {name} -> {target}")
-        providers.add(PurePosixPath(name).name)
+        while target in links:
+            target = links[target]
+        if target in needed_by:
+            providers.add(PurePosixPath(name).name)
     for name, needed in needed_by.items():
         missing = needed - providers - SYSTEM_LIBS
         if missing:
@@ -140,6 +173,9 @@ def audit(deb: Path, expected_version: str | None = None) -> dict:
     for relative in required:
         if ROOT + "/" + relative not in names:
             raise ValueError(f"missing installed layout: {relative}")
+    for relative in LAUNCHERS | NATIVE_PROGRAMS:
+        if ROOT + "/" + relative not in sizes:
+            raise ValueError(f"runtime command must be a regular file: {relative}")
     if not needed_by:
         raise ValueError("package has no native runtime")
     groups: Counter = Counter()
@@ -155,6 +191,7 @@ def audit(deb: Path, expected_version: str | None = None) -> dict:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()
     return {"validation": "HOST_ARTIFACT_INSPECTION_ONLY", "version": fields["Version"],
             "sha256": digest, "deb_bytes": deb.stat().st_size,
+            "installed_size_kib": int(fields["Installed-Size"]) if "Installed-Size" in fields else None,
             "payload_bytes": sum(sizes.values()), "elf_objects": len(needed_by),
             "native_library_bytes": sum(sizes[name] for name in needed_by if ".so" in PurePosixPath(name).suffixes),
             "component_bytes": dict(groups), "largest_site_packages": site_packages.most_common(20),
@@ -169,7 +206,7 @@ def main() -> None:
     args = parser.parse_args()
     try:
         report = json.dumps(audit(args.deb, args.version), indent=2) + "\n"
-    except (ValueError, OSError, subprocess.SubprocessError) as exc:
+    except (ValueError, OSError, tarfile.TarError, subprocess.SubprocessError) as exc:
         parser.exit(1, f"Termux artifact inspection failed: {exc}\n")
     if args.report:
         args.report.write_text(report, encoding="utf-8")

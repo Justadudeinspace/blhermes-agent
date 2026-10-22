@@ -37,6 +37,11 @@ def test_bionic_facts_and_agent_keep_fixed_prefix_and_tui_only(tmp_path):
     (tui / "dist").mkdir(parents=True)
     (tui / "dist/entry.js").write_text("built", encoding="utf-8")
     (tui / "package.json").write_text('{"type":"module"}', encoding="utf-8")
+    for name in ("tests", "website", "ui-tui", "apps", "node_modules", ".build", "__pycache__"):
+        (repo / name).mkdir()
+        (repo / name / "sentinel").write_text("must not ship")
+    (repo / "scripts/termux").mkdir(parents=True)
+    (repo / "scripts/termux/probe.py").write_text("runtime helper")
     build_set = tmp_path / "build-set.txt"
     build_set.write_bytes(b"\xef\xbb\xbfnative-fixture\n")
     write_facts(payload, lock, build_set, tui)
@@ -48,3 +53,6 @@ def test_bionic_facts_and_agent_keep_fixed_prefix_and_tui_only(tmp_path):
     assert json.loads((payload / "native-wheels.json").read_text()) == ["native-fixture"]
     facts = Facts(payload / "tools/facts.json", strict=True)
     assert all(facts.get(name)["target"] == target for name in tools)
+
+    assert not any((repo / name).exists() for name in ("tests", "website", "apps", "ui-tui", "node_modules", ".build", "__pycache__"))
+    assert (repo / "scripts/termux/probe.py").read_text() == "runtime helper"

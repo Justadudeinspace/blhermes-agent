@@ -101,3 +101,39 @@ def test_source_pin_rejects_moved_revision_and_missing_locked_metadata(tmp_path)
     lock.write_text("package = []\n", encoding="utf-8")
     with pytest.raises(ValueError, match="lock"):
         builder.normalize_reqs(export, lock, resolved)
+
+
+def test_runtime_export_includes_android_baseline_instead_of_acp_only(tmp_path, monkeypatch):
+    import pm
+    from scripts.termux.build_wheels import export_runtime_requirements
+
+    selected = []
+
+    def export(source, out, *, extras, explicit):
+        assert source == tmp_path and explicit
+        selected.extend(extras)
+        out.write_text('fixture==1\n')
+
+    monkeypatch.setattr(pm, 'export_requirements', export)
+    output = tmp_path / 'requirements.txt'
+    export_runtime_requirements(tmp_path, output)
+    assert selected == ['termux']
+    assert output.read_text() == 'fixture==1\n'
+
+
+def test_native_import_gate_does_not_accept_pure_python_fallback(monkeypatch):
+    import importlib
+    from scripts.termux.build_wheels import import_native_modules
+
+    imported = []
+
+    def load(name):
+        imported.append(name)
+        if name.endswith('._multidict'):
+            raise ImportError('broken native extension')
+        return object()
+
+    monkeypatch.setattr(importlib, 'import_module', load)
+    with pytest.raises(ImportError, match='broken native'):
+        import_native_modules(['cryptography', 'multidict'])
+    assert imported == ['cryptography.hazmat.bindings._rust', 'multidict._multidict']

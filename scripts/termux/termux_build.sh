@@ -246,8 +246,7 @@ mkdir -p "$WHEELHOUSE"
 rm -f "$OUT_ABS/index.json" "$OUT_ABS/SHA256SUMS" "$WORK/resolved.txt" "$WORK/build_set.txt"
 # [d] Resolve the real graph from the tag's own lock.
 log "Resolving dependency graph from the tag's uv.lock"
-( cd "$REPO_ROOT" && python3 -m pm.build_env --source "$WORK/tree" \
-    --extra acp --export-requirements "$WORK/req.txt" ) \
+( cd "$REPO_ROOT" && python3 "$HERE/build_wheels.py" --export "$WORK/tree" "$WORK/req.txt" ) \
     || fail "PM requirements export failed (frozen lock at $REF)"
 # Host parsing needs packaging too. Use the release lock, not runner packages.
 PACKAGING_SPEC="$(python3 - "$WORK/tree/uv.lock" <<'PY'
@@ -355,17 +354,17 @@ needs_build = []
 excluded = 0
 missed = []
 for name, covered, err in results:
+    if err is not None:
+        raise RuntimeError(f"wheel inventory unavailable for {name}: {err}; retry with working PyPI access")
     if covered is None:
         excluded += 1
         continue
-    if err is not None:
-        print(f"  probe miss {name}: {err} -> building from sdist", file=sys.stderr)
     if not covered:
         if name in ANDROID_BUILD_MISSES:
             missed.append((name, ANDROID_BUILD_MISSES[name]))
             continue
         needs_build.append(name)
-open(sys.argv[2], "w", encoding="utf-8").write("\n".join(needs_build) + "\n")
+open(sys.argv[2], "w", encoding="utf-8").write("\n".join(sorted(needs_build)) + "\n")
 print(f"  {excluded} of {len(entries)} deps are marker-excluded for android")
 for name, why in missed:
     print(f"  documented build miss: {name} ({why})")

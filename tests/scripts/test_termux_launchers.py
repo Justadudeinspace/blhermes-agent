@@ -38,7 +38,7 @@ def test_launchers_forward_arguments_and_export_payload_environment(tmp_path):
         result = subprocess.run(
             [shutil.which("sh"), str(link), "one two", "$(not-executed)", ""],
             cwd=tmp_path, check=True, capture_output=True, text=True,
-            env={**os.environ, "PYTHONHOME": "/does-not-exist", "PYTHONPATH": "/foreign"},
+            env={**os.environ, "PYTHONHOME": "/does-not-exist", "PYTHONPATH": "/foreign", "PREFIX": "/data/data/com.termux/files/usr", "TMPDIR": str(tmp_path)},
         )
         data = json.loads(result.stdout)
         assert data["argv"] == ["one two", "$(not-executed)", ""]
@@ -74,6 +74,8 @@ def test_postinst_refuses_foreign_path_and_prerm_preserves_it(tmp_path):
     assert link.read_text(encoding="utf-8") == "foreign launcher"
 
 
+# This contract intentionally delivers real signals to its own freshly spawned tree.
+@pytest.mark.live_system_guard_bypass
 @pytest.mark.platforms("posix")
 def test_verifier_stops_detached_descendants_before_cleanup(tmp_path):
     import psutil
@@ -102,3 +104,49 @@ def test_verifier_stops_detached_descendants_before_cleanup(tmp_path):
             descendant.kill()
         child.wait(timeout=10)
         child.stdout.close()
+
+
+@pytest.mark.platforms('posix')
+@pytest.mark.parametrize('variable,value,message', [
+    ('HOME', '', 'HOME must be'), ('HERMES_HOME', 'relative', 'HERMES_HOME must be'),
+    ('TMPDIR', 'relative', 'TMPDIR must be'), ('PREFIX', '/foreign', 'Unsupported PREFIX'),
+])
+def test_bionic_launcher_environment_failures_are_actionable(tmp_path, variable, value, message):
+    payload = tmp_path / 'payload'
+    (payload / 'venv/bin').mkdir(parents=True)
+    (payload / 'venv/bin/python').symlink_to(sys.executable)
+    write_launchers(payload, {'hermes': 'capture_entry:main'}, python='venv/bin/python',
+                    repo='app', site='site', target='linux-arm64-bionic')
+    env = {**os.environ, 'HOME': str(tmp_path), 'HERMES_HOME': str(tmp_path / 'state'),
+           'TMPDIR': str(tmp_path), 'PREFIX': '/data/data/com.termux/files/usr', variable: value}
+    result = subprocess.run([shutil.which('sh'), str(payload / 'bin/hermes')], env=env,
+                            capture_output=True, text=True, timeout=30, check=False)
+    assert result.returncode == 2
+    assert message in result.stderr
+    assert 'Traceback' not in result.stderr
+
+
+@pytest.mark.platforms('posix')
+def test_remove_purge_reinstall_preserves_all_profile_data(tmp_path):
+    from scripts.termux.launchers import write_maintainer_scripts
+
+    control = tmp_path / 'DEBIAN'
+    control.mkdir()
+    prefix = tmp_path / 'prefix'
+    state = tmp_path / 'private state'
+    state.mkdir()
+    data = {'config.yaml': 'model: fixture', '.env': 'FIXTURE_KEY=private',
+            'skills/example/SKILL.md': '# fixture', 'plugins/example/plugin.yaml': 'name: example',
+            'cron/jobs.json': '[]', 'sessions.db': 'synthetic session', 'memories/MEMORY.md': 'fixture'}
+    for name, text in data.items():
+        path = state / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text)
+    write_maintainer_scripts(control, ['hermes', 'hermes-acp'])
+    env = {**os.environ, 'PREFIX': str(prefix), 'HOME': str(tmp_path), 'HERMES_HOME': str(state)}
+    for script, action in [('postinst', 'configure'), ('prerm', 'upgrade'),
+                           ('postinst', 'configure'), ('prerm', 'remove'), ('prerm', 'purge'),
+                           ('postinst', 'configure')]:
+        subprocess.run([shutil.which('sh'), str(control / script), action], env=env, check=True, timeout=30)
+        assert {name: (state / name).read_text() for name in data} == data
+    assert (prefix / 'bin/hermes').is_symlink()

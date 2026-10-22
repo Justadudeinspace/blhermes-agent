@@ -55,7 +55,7 @@ ripgrep, FFmpeg y las dependencias de Python. Si falta Git, descarga el archivo
 verificado de Git for Windows en el almacén de BLHermes, sin reemplazar el Git
 del sistema. MSIX/App Installer es una distribución separada.
 
-> **Android / Termux:** La aceptación de la versión está pendiente; por ahora no se admite la instalación para uso en producción. Ya existe una base importante de empaquetado y soporte de ejecución para Android/Termux, cuya validación continúa. BLHermes no utiliza el repositorio de paquetes de Nous como servicio de distribución propio. Consulta la [guía de Termux de BLHermes](docs/termux.md) y el [informe de validación](BLHERMES_TERMUX_RELEASE.md). No uses el instalador de escritorio y servidor en Termux.
+> **Android / Termux:** La aceptación de la versión está pendiente; por ahora no se admite la instalación para uso en producción. Ya existe una base importante de empaquetado y soporte de ejecución para Android/Termux, cuya validación continúa. BLHermes no utiliza el repositorio de paquetes de Nous como servicio de distribución propio. Consulta la [guía de Termux de BLHermes](docs/termux.md) y el [informe de validación](BLHERMES_TERMUX_RELEASE.md). No uses el instalador de escritorio y servidor en Termux. [Comprobaciones previas y migración desde Hermes](BLHERMES_PRE_DEVICE_COMPLETE.md).
 >
 > **Windows:** Windows nativo es totalmente compatible — el comando de PowerShell de arriba instala todo. Si prefieres usar WSL2, el comando de Linux también funciona allí. La instalación nativa de Windows se encuentra en `%LOCALAPPDATA%\hermes`; WSL2 instala en `~/.hermes` como en Linux.
 

@@ -3,10 +3,25 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+
+def trim_application(repo: Path) -> None:
+    from scripts.bundles.payload import INERT_SNAPSHOT_DIRS
+
+    # Validation/PM helpers under scripts are runtime inputs for this package.
+    # Source-only frontends have already been planted as built products.
+    for name in (*[name for name in INERT_SNAPSHOT_DIRS if name != "scripts"],
+                 ".git", ".build", "node_modules", ".pytest_cache", "__pycache__"):
+        path = repo / name
+        if path.is_symlink():
+            path.unlink()
+        elif path.is_dir():
+            shutil.rmtree(path)
 
 
 def write_facts(payload: Path, lock_path: Path, build_set: Path, tui: Path) -> None:
@@ -35,6 +50,7 @@ def write_facts(payload: Path, lock_path: Path, build_set: Path, tui: Path) -> N
         resources={name: repo / name for name in RESOURCE_ENV}, frontends={"tui": tui.resolve()},
         stamp=repo / "install-stamp.json",
     ), payload)
+    trim_application(repo)
 
 
 if __name__ == "__main__":

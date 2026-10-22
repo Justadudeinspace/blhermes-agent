@@ -235,16 +235,17 @@ Package: $PKG
 Version: $DEB_VERSION
 Architecture: aarch64
 Maintainer: BLHermes maintainers
+Depends: ca-certificates
 Description: BLHermes Agent CLI for Termux (self-contained bundled python/node/venv)
 Installed-Size: $(du -sk "$STAGE/$ROOT_IN_DEB" | cut -f1)
 EOF
-# Self-contained: no Depends line at all. Our python, node and venv ship inside.
+# Python/Node/venv are bundled; system trust roots remain owned by Termux.
 
 # [7] Validation hook: install into a FRESH container of the pinned image and
 # smoke-test the exact binaries the phone will run. No opt-out.
 log "Validating in a fresh pinned termux-docker container"
 DEB="$OUT_ABS/${PKG}_${DEB_VERSION}_aarch64.deb"
-rm -f "$DEB"
+rm -f "$DEB" "$DEB.audit.json" "$DEB.release.json"
 # Use xz for both archive members so Termux dpkg can extract the package.
 dpkg-deb --build -Zxz --root-owner-group "$STAGE" "$DEB" || fail "dpkg-deb --build failed"
 python3 "$HERE/audit_deb.py" "$DEB" --version "$DEB_VERSION" --report "$DEB.audit.json" \
@@ -263,4 +264,6 @@ docker run --rm --platform linux/arm64 \
         "source $ctmp/check.sh; \"\$root/venv/bin/python\" -m pm.cli status" \
     || fail "container validation failed"
 
+python3 "$HERE/release_manifest.py" --commit "$COMMIT" --deb "$DEB" \
+    --container-validated --output "$DEB.release.json" || fail "release summary failed"
 log "Built $DEB (validated)"
