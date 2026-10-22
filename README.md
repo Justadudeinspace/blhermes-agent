@@ -64,7 +64,7 @@ for Windows archive in BLHermes' tool store. It does not replace your system Git
 See [installation methods](https://hermes-agent.nousresearch.com/docs/getting-started/installation)
 for the separate MSIX/App Installer package and its update ownership.
 
-> **Android / Termux:** The APT package is currently marked broken; see the warning in the [Termux guide](https://hermes-agent.nousresearch.com/docs/getting-started/termux) before attempting installation. The aarch64 package includes Python, Node.js, and the TUI, with `stable` and prerelease `canary` channels. The desktop/server installer script is not the Termux installation path.
+> **Android / Termux:** Release acceptance is pending; production installation is currently unsupported. Substantial Android/Termux packaging and runtime support exists, and release qualification is in progress. BLHermes does not use the upstream Nous package feed as its own release service. See the [BLHermes Termux guide](docs/termux.md) and [release handoff](BLHERMES_TERMUX_RELEASE.md). The desktop/server installer is not the Termux installation path.
 >
 > **Windows:** Native Windows is fully supported — the PowerShell one-liner above installs everything. If you'd rather use WSL2, the Linux command works there too. Native Windows install lives under `%LOCALAPPDATA%\hermes`; WSL2 installs under `~/.hermes` as on Linux.
 

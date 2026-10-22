@@ -61,7 +61,6 @@ done
 for tool in python3 git docker dpkg-deb jq readelf; do
     command -v "$tool" >/dev/null || fail "missing tool: $tool"
 done
-docker info >/dev/null 2>&1 || fail "Docker daemon unavailable; use a native aarch64 Linux build host with Docker access"
 
 DIGEST="$(cd "$REPO_ROOT" && python3 -c 'from pm.lock import termux_docker_digest; print(termux_docker_digest())')"
 [ -n "$DIGEST" ] || fail "termux-docker digest missing from pm/lock.json"
@@ -119,6 +118,7 @@ if [ -z "$COMMIT_MODE" ] && [ -z "$RELEASE_COMMIT" ]; then
     log "Deriving Debian version from tag $TAG"
     DEB_VERSION="$(python3 "$HERE/deb_version.py" "$TAG")" || fail "version derivation failed for tag $TAG"
 fi
+docker info >/dev/null 2>&1 || fail "Docker daemon unavailable; use a native aarch64 Linux build host with Docker access"
 log "Package version: $DEB_VERSION"
 OUT_ABS="$(mkdir -p "$OUT" && cd "$OUT" && pwd)"
 

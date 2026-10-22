@@ -37,9 +37,7 @@ curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 
 支持 Linux、macOS 和 WSL2。安装程序会自动处理平台特定的配置。
 
-> **Termux 状态：** APT 软件包目前被标记为无法正常工作。安装前请先阅读 Termux 指南中的警告。
->
-> **Android / Termux：** aarch64 设备可使用预发布的 APT 软件包，其中包含 Python、Node.js 和 TUI。请按照 [Termux 指南](https://hermes-agent.nousresearch.com/docs/getting-started/termux)安装，不要使用桌面和服务器的安装脚本。
+> **Android / Termux：** 发布验收尚未完成，目前不支持生产环境安装。Android/Termux 的打包和运行时支持已具备相当基础，发布验证仍在进行。BLHermes 不将上游 Nous 软件源作为自己的发布渠道。请参阅 [BLHermes Termux 指南](docs/termux.md)和[发布交接记录](BLHERMES_TERMUX_RELEASE.md)。请勿在 Termux 中使用桌面或服务器安装脚本。
 >
 > **Windows：** 在 PowerShell 中运行：
 > ```powershell

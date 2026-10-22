@@ -1,8 +1,10 @@
 # Building the Termux distribution
 
-This is operator documentation. End users install a signed APT package; they
-never build Python, wheels, or the frontend on their phone. Support remains
-blocked pending the release gates in `BLHERMES_TERMUX_RELEASE.md`.
+This is operator documentation. The intended end-user distribution is a signed
+APT package; public BLHermes APT distribution is not provisioned. End users
+never build Python, wheels, or the frontend on their phone. Production support
+remains pending the release gates in `BLHERMES_TERMUX_RELEASE.md`. See the
+[end-user guide](../../docs/termux.md) for current installation status.
 
 ## Build
 
@@ -64,6 +66,7 @@ Provision a BLHermes-owned URL, key, release-signing environment and runner;
 upstream Nous feeds are not this fork's release service. Publish no support
 claim until the real-device procedure passes on the exact archive hash.
 
-The complete A–M device procedure and outstanding gates live in
-`BLHERMES_TERMUX_RELEASE.md`. Container results never count as Android device UX
-or authenticated model acceptance.
+The twenty-test [device acceptance worksheet](../../docs/termux-device-acceptance.md)
+and `BLHERMES_TERMUX_RELEASE.md` record the manual procedure and outstanding
+gates. Container results never count as Android device UX or authenticated
+model acceptance.
